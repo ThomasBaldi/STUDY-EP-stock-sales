@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
 			foreignKey: {
 				name: 'Role',
 				type: Sequelize.DataTypes.INTEGER,
-				defaultValue: 2,
+				defaultValue: 1,
 			},
 		});
 	};
