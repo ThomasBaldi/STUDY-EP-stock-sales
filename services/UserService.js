@@ -44,6 +44,7 @@ class UserService {
 
 	async getOne(username) {
 		return await this.User.findOne({
+			raw: true,
 			where: { Username: username },
 		});
 	}
@@ -54,7 +55,7 @@ class UserService {
 			Password: password,
 			Email: email,
 			Salt: salt,
-			Role: 3,
+			Role: 1,
 		});
 	}
 
@@ -64,7 +65,7 @@ class UserService {
 				id: userId,
 				Role: {
 					//Admin cannot be deleted
-					[Op.not]: 3,
+					[Op.not]: 1,
 				},
 			},
 		});

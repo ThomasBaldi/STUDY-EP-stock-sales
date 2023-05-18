@@ -8,15 +8,6 @@ var userService = new UserService(db);
 
 const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-//insert roles into table once tables are created from app.js, if they don't exist
-db.sequelize.sync({ force: false }).then(() => {
-	const existRoles = userService.getRoles();
-	if (existRoles.length == 0) {
-		const roles = ['Registered', 'Guest', 'Admin'];
-		roles.forEach((e) => userService.createRole(e));
-	}
-});
-
 router.post('/signup', async (req, res, next) => {
 	const { username, password, email } = req.body;
 	const existingUser = await userService.getOne(username);

@@ -1,5 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
 	const Item = sequelize.define('Item', {
+		id: {
+			type: Sequelize.DataTypes.INTEGER,
+			primaryKey: true,
+			allowNull: false,
+			unique: true,
+		},
 		Name: {
 			type: Sequelize.DataTypes.STRING,
 			allowNull: false,
@@ -22,6 +28,14 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.DataTypes.INTEGER,
 			allowNull: false,
 		},
+		Image: {
+			type: Sequelize.DataTypes.STRING,
+			allowNull: true,
+		},
+		CategoryId: {
+			type: Sequelize.DataTypes.INTEGER,
+			allowNull: false,
+		},
 		createdAt: {
 			allowNull: false,
 			type: Sequelize.DATE,
@@ -35,8 +49,8 @@ module.exports = (sequelize, Sequelize) => {
 	});
 
 	Item.associate = function (models) {
-		Item.belongsToMany(models.Category, { through: models.ItemCategory });
-		Item.belongsToMany(models.Cart, { through: models.ItemCart, foreignKey: 'CartId' });
+		Item.belongsToMany(models.Cart, { through: models.ItemCart, foreignKey: 'ItemId' });
+		Item.belongsTo(models.Category);
 	};
 	return Item;
 };
