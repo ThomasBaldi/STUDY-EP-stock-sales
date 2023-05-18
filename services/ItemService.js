@@ -27,7 +27,12 @@ class ItemService {
 
 	async getAll() {
 		return this.Item.findAll({
+			raw: true,
 			where: {},
+			include: {
+				model: this.Category,
+				attributes: ['name'],
+			},
 		});
 	}
 
