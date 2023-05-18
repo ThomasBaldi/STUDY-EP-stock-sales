@@ -50,32 +50,37 @@ router.post('/', async (req, res, next) => {
 		existCategories.length == 0 ||
 		existsItems.length == 0
 	) {
-		//roles
-		userService.createRole('Admin');
-		userService.createRole('User');
+		try {
+			//roles
+			userService.createRole('Admin');
+			userService.createRole('User');
 
-		//Admin user
-		let salt = crypto.randomBytes(16);
-		userService.createAdmin('Admin', 'P@ssword2023', 'admin@admin.com', salt);
+			//Admin user
+			let salt = crypto.randomBytes(16);
+			userService.createAdmin('Admin', 'P@ssword2023', 'admin@admin.com', salt);
 
-		//categories
-		newCategories.forEach((e) => itemService.createCat(e.id, e.name));
+			//categories
+			newCategories.forEach((e) => itemService.createCat(e.id, e.name));
 
-		//items
-		items.forEach((e) => {
-			itemService.create(
-				e.id,
-				e.item_name,
-				e.price,
-				e.sku,
-				e.stock_quantity,
-				e.img_url,
-				e.category
-			);
-		});
+			//items
+			items.forEach((e) => {
+				itemService.create(
+					e.id,
+					e.item_name,
+					e.price,
+					e.sku,
+					e.stock_quantity,
+					e.img_url,
+					e.category
+				);
+			});
+		} catch (err) {
+			console.log(err);
+			res.status(400).json({ message: 'Something went wrong with the setup.' });
+		}
 
 		res.status(200).json({
-			message: 'Roles, Admin user and Items from API are succesfully added to DB.',
+			message: 'Roles, Admin user, Categories and Items from API are succesfully added to DB.',
 		});
 	} else {
 		res.status(300).json({ message: 'All setup data has already been added to DB' });
