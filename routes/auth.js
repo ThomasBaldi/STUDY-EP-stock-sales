@@ -45,15 +45,15 @@ router.post('/signup', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
-	const { username, password } = req.body;
-	const existingUser = await userService.getOne(username);
+	const { Username, Password } = req.body;
+	const existingUser = await userService.getOne(Username);
 
-	if (!username || !password) {
+	if (!Username || !Password) {
 		res.status(400).json({ message: 'One or more properties are missing.' });
 	} else if (!existingUser) {
 		res.status(400).json({ message: 'Invalid username.' });
 	} else {
-		crypto.pbkdf2(password, existingUser.Salt, 310000, 32, 'sha256', (err, hash) => {
+		crypto.pbkdf2(Password, existingUser.Salt, 310000, 32, 'sha256', (err, hash) => {
 			if (err) {
 				return err;
 			}

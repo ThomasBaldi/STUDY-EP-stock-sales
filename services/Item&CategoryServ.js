@@ -75,7 +75,7 @@ class ItemService {
 		});
 	}
 
-	async delete(ItemId) {
+	async deleteItem(ItemId) {
 		return this.Item.destroy({
 			where: {
 				id: ItemId,
@@ -98,10 +98,17 @@ class ItemService {
 		});
 	}
 
-	async getOneCat(id) {
+	async getOneCatById(id) {
 		return this.Category.findOne({
 			raw: true,
 			where: { id: id },
+		});
+	}
+
+	async getOneCat(name) {
+		return this.Category.findOne({
+			raw: true,
+			where: { Name: name },
 		});
 	}
 
@@ -121,8 +128,8 @@ class ItemService {
 		);
 	}
 
-	async deleteItem(id) {
-		return this.Item.destroy({
+	async deleteCat(id) {
+		return this.Category.destroy({
 			where: {
 				id: id,
 			},

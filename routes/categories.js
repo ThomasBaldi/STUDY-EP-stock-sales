@@ -13,9 +13,16 @@ router
 	.get('/', async (req, res, next) => {
 		try {
 			let allCategories = await itemService.getAllCat();
+			var categories = [];
+			allCategories.forEach((e) => {
+				categories.push({
+					Name: e.Name,
+					id: e.id,
+				});
+			});
 			res.status(200).json({
 				message: 'All available categories!',
-				Categories: allCategories,
+				Categories: categories,
 			});
 		} catch (err) {
 			console.log(err);
@@ -41,7 +48,8 @@ router
 		let Name = req.body.Name;
 		let id = req.params.id;
 		let nameExists = await itemService.getOneCat(Name);
-		if (id) {
+		let idExists = await itemService.getOneCatById(id);
+		if (idExists) {
 			if (!Name) {
 				res.status(400).json(categoryNameMsg);
 			} else {
@@ -60,11 +68,11 @@ router
 	})
 	.delete('/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
-		let idExists = await itemService.getOneCat(id);
+		let idExists = await itemService.getOneCatById(id);
 		let categoryInUse = await itemService.getAllByCat(id);
 		if (idExists) {
-			if (categoryInUse.length > 0) {
-				itemService.delete(id);
+			if (categoryInUse.length == 0) {
+				itemService.deleteCat(id);
 				res.status(200).json({
 					message: `Category with id ${id} was succesfully deleted.`,
 				});

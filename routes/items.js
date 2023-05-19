@@ -40,7 +40,7 @@ router
 		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
 		let nameExists = await itemService.getOne(Name);
 		let skuExists = await itemService.getSKU(SKU);
-		let categoryExists = await itemService.getOneCat(Category);
+		let categoryExists = await itemService.getOneCatById(Category);
 		if (!Name || !Price || !SKU || !Category) {
 			res.status(400).json({
 				message: 'One or more mandatory fields are missing.',
@@ -80,7 +80,7 @@ router
 			skuExists = await itemService.getSKU(SKU);
 		}
 		if (Category) {
-			categoryExists = await itemService.getOneCat(Category);
+			categoryExists = await itemService.getOneCatById(Category);
 		}
 		//when id exists, validate req.body and attributes and then update
 		if (idExists) {
@@ -116,7 +116,7 @@ router
 		let id = req.params.id;
 		let idExists = await itemService.getOneById(id);
 		if (idExists) {
-			itemService.delete(id);
+			itemService.deleteItem(id);
 			res.status(200).json({
 				message: `Item with id ${id} was succesfully deleted.`,
 			});
