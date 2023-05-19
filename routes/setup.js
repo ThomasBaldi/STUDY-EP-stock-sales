@@ -4,7 +4,7 @@ var crypto = require('crypto');
 const axios = require('axios');
 var db = require('../models');
 var UserService = require('../services/UserService');
-var ItemService = require('../services/ItemService');
+var ItemService = require('../services/Item&CategoryServ');
 var userService = new UserService(db);
 var itemService = new ItemService(db);
 

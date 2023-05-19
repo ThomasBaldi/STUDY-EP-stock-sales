@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var ItemService = require('../services/ItemService');
+var ItemService = require('../services/Item&CategoryServ');
 var itemService = new ItemService(db);
 var { checkIfAdmin } = require('../models/middleware/authMiddleware');
 
@@ -102,7 +102,6 @@ router
 				} else if (Quantity <= 0) {
 					res.status(400).json(quantityMsg);
 				} else {
-					console.log(typeof id);
 					itemService.updateItem(id, req.body);
 					res.status(200).json({
 						message: `Item with id: ${id} was succesfully updated.`,
@@ -113,7 +112,7 @@ router
 			res.status(400).json(idMsg);
 		}
 	})
-	.delete('/:id', async (req, res, next) => {
+	.delete('/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
 		let idExists = await itemService.getOneById(id);
 		if (idExists) {

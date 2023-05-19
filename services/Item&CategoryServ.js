@@ -60,6 +60,13 @@ class ItemService {
 		});
 	}
 
+	async getAllByCat(id) {
+		return this.Item.findAll({
+			raw: true,
+			where: { CategoryId: id },
+		});
+	}
+
 	async updateItem(id, body) {
 		return this.Item.update(body, {
 			where: {
@@ -85,6 +92,12 @@ class ItemService {
 		});
 	}
 
+	async createNewCat(name) {
+		return this.Category.create({
+			Name: name,
+		});
+	}
+
 	async getOneCat(id) {
 		return this.Category.findOne({
 			raw: true,
@@ -99,10 +112,13 @@ class ItemService {
 		});
 	}
 
-	async update(id) {
-		return this.Category.update({
-			where: { id: id },
-		});
+	async updateCat(id, name) {
+		return this.Category.update(
+			{ Name: name },
+			{
+				where: { id: id },
+			}
+		);
 	}
 
 	async deleteItem(id) {
