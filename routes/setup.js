@@ -57,7 +57,15 @@ router.post('/', async (req, res, next) => {
 
 			//Admin user
 			let salt = crypto.randomBytes(16);
-			userService.createAdmin('Admin', 'P@ssword2023', 'admin@admin.com', salt);
+			crypto.pbkdf2('P@ssword2023', salt, 310000, 32, 'sha256', (err, hash) => {
+				if (err) throw new Error('Internal Server Error');
+				try {
+					userService.createAdmin('Admin', hash, 'admin@admin.com', salt);
+				} catch (err) {
+					console.log(err);
+					res.status(400);
+				}
+			});
 
 			//categories
 			newCategories.forEach((e) => itemService.createCat(e.id, e.name));

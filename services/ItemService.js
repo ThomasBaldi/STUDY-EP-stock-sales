@@ -19,9 +19,33 @@ class ItemService {
 		});
 	}
 
-	async getOne() {
+	async createNew(name, price, sku, quantity, image, category) {
+		return this.Item.create({
+			Name: name,
+			Price: price,
+			SKU: sku,
+			Quantity: quantity,
+			Image: image,
+			CategoryId: category,
+		});
+	}
+
+	async getOne(name) {
 		return this.Item.findOne({
-			where: {},
+			where: { Name: name },
+		});
+	}
+
+	async getOneById(id) {
+		return this.Item.findOne({
+			raw: true,
+			where: { id: id },
+		});
+	}
+
+	async getSKU(sku) {
+		return this.Item.findOne({
+			where: { SKU: sku },
 		});
 	}
 
@@ -36,23 +60,23 @@ class ItemService {
 		});
 	}
 
-	async update() {
-		return this.Item.update({
-			where: {},
-		});
-	}
-
-	async deleteItem(ItemId) {
-		return this.Item.destroy({
+	async updateItem(id, body) {
+		return this.Item.update(body, {
 			where: {
-				id: ItemId,
-				Role: {
-					//Admin cannot be deleted
-					[Op.not]: 1,
-				},
+				id: id,
 			},
 		});
 	}
+
+	async delete(ItemId) {
+		return this.Item.destroy({
+			where: {
+				id: ItemId,
+			},
+		});
+	}
+
+	//category methods -----------------------------------------------
 
 	async createCat(id, name) {
 		return this.Category.create({
@@ -61,10 +85,10 @@ class ItemService {
 		});
 	}
 
-	async getOneCat(name) {
+	async getOneCat(id) {
 		return this.Category.findOne({
 			raw: true,
-			where: { Name: name },
+			where: { id: id },
 		});
 	}
 

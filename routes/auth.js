@@ -51,14 +51,14 @@ router.post('/login', async (req, res, next) => {
 	if (!username || !password) {
 		res.status(400).json({ message: 'One or more properties are missing.' });
 	} else if (!existingUser) {
-		res.status(400).json({ message: 'Ivalid username.' });
+		res.status(400).json({ message: 'Invalid username.' });
 	} else {
 		crypto.pbkdf2(password, existingUser.Salt, 310000, 32, 'sha256', (err, hash) => {
 			if (err) {
 				return err;
 			}
 			if (!crypto.timingSafeEqual(Buffer.from(existingUser.Password), hash)) {
-				res.status(400).json({ message: 'Ivalid password.' });
+				res.status(400).json({ message: 'Invalid password.' });
 			}
 			//jwt token
 			let token;

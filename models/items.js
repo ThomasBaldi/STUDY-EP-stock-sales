@@ -3,6 +3,7 @@ module.exports = (sequelize, Sequelize) => {
 		id: {
 			type: Sequelize.DataTypes.INTEGER,
 			primaryKey: true,
+			autoIncrement: true,
 			allowNull: false,
 			unique: true,
 		},
@@ -23,6 +24,7 @@ module.exports = (sequelize, Sequelize) => {
 		SKU: {
 			type: Sequelize.DataTypes.STRING,
 			allowNull: false,
+			unique: true,
 		},
 		Quantity: {
 			type: Sequelize.DataTypes.INTEGER,
