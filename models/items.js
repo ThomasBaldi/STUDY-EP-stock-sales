@@ -51,8 +51,9 @@ module.exports = (sequelize, Sequelize) => {
 	});
 
 	Item.associate = function (models) {
-		Item.belongsToMany(models.Cart, { through: models.ItemCart, foreignKey: 'ItemId' });
 		Item.belongsTo(models.Category);
+		Item.belongsToMany(models.Cart, { through: models.ItemCart, foreignKey: 'ItemId' });
+		Item.hasMany(models.ItemCart);
 	};
 	return Item;
 };

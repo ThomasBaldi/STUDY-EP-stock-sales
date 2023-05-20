@@ -40,7 +40,7 @@ router
 		} else {
 			itemService.createNewCat(Name);
 			res.status(200).json({
-				message: `${Name} is succesfully added to the categories list.`,
+				message: `${Name} was succesfully added to the categories list.`,
 			});
 		}
 	})

@@ -9,9 +9,10 @@ db.sequelize.sync({ force: false });
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
-var setupRouter = require('./routes/setup');
+var utilityRouter = require('./routes/utility');
 var itemsRouter = require('./routes/items');
 var categoriesRouter = require('./routes/categories');
+var cartRouter = require('./routes/cart');
 
 var app = express();
 
@@ -27,9 +28,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', authRouter);
-app.use('/setup', setupRouter);
+app.use('/utility', utilityRouter);
 app.use('/items', itemsRouter);
 app.use('/categories', categoriesRouter);
+app.use('/cart', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

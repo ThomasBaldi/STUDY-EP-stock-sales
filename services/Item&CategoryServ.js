@@ -32,6 +32,7 @@ class ItemService {
 
 	async getOne(name) {
 		return this.Item.findOne({
+			raw: true,
 			where: { Name: name },
 		});
 	}

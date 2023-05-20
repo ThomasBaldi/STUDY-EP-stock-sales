@@ -61,7 +61,7 @@ router
 		} else {
 			itemService.createNew(Name, Price, SKU, Quantity, Image, Category);
 			res.status(200).json({
-				message: `${Name} is succesfully added to the items list.`,
+				message: `${Name} was succesfully added to the items list.`,
 			});
 		}
 	})
