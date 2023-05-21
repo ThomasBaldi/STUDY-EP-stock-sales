@@ -155,13 +155,20 @@ router
 			try {
 				if (id) {
 					let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
+					let itemStock = await itemService.getOneById(id);
 					if (!itemIsInCart) {
 						res.status(400).json(noSuchItemInCart);
 					} else {
-						cartService.updateQuantity(id, cart.id, quant);
-						res.status(200).json({
-							message: `Quantity for item with id ${id} was successfully updated to ${quant}.`,
-						});
+						if (itemStock.Quantity >= quant) {
+							cartService.updateQuantity(id, cart.id, quant);
+							res.status(200).json({
+								message: `Quantity for item with id ${id} was successfully updated to ${quant}.`,
+							});
+						} else {
+							res.status(400).json({
+								message: `There's not enough stock, total available quantity is ${itemStock.Quantity}`,
+							});
+						}
 					}
 				}
 			} catch (err) {
