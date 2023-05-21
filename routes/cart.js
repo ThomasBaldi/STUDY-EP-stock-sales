@@ -179,7 +179,30 @@ router
 			}
 		}
 	})
-	.delete('/:id', checkIfUser, async (req, res, next) => {})
-	.delete('/cart_item/:id', checkIfUser, async (req, res, next) => {});
+	.delete('/cart_item/:id', checkIfUser, async (req, res, next) => {
+		let id = req.params.id;
+		const token = req.headers.authorization.split(' ')[1];
+		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		let cart = await cartService.getCart(decodedToken.UserId);
+		try {
+			if (id) {
+				let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
+				if (!itemIsInCart) {
+					res.status(400).json(noSuchItemInCart);
+				} else {
+					cartService.deleteCartItem(id, cart.id);
+					res.status(200).json({
+						message: `Item with id ${id} was successfully deleted from your cart.`,
+					});
+				}
+			}
+		} catch (err) {
+			console.log(err);
+			res.status(400).json({
+				message: 'Something went wrong with the cart item search.',
+			});
+		}
+	})
+	.delete('/:id', checkIfUser, async (req, res, next) => {});
 
 module.exports = router;
