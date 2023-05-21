@@ -19,17 +19,9 @@ router
 	.get('/', async (req, res, next) => {
 		try {
 			let allItems = await itemService.getAll();
-			var items = [];
-			allItems.forEach((e) =>
-				items.push({
-					name: e.Name,
-					category: e['Category.name'],
-					price: e.Price,
-				})
-			);
 			res.status(200).json({
 				message: 'All available items!',
-				Items: items,
+				Items: allItems,
 			});
 		} catch (err) {
 			console.log(err);

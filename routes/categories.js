@@ -13,16 +13,9 @@ router
 	.get('/', async (req, res, next) => {
 		try {
 			let allCategories = await itemService.getAllCat();
-			var categories = [];
-			allCategories.forEach((e) => {
-				categories.push({
-					Name: e.Name,
-					id: e.id,
-				});
-			});
 			res.status(200).json({
 				message: 'All available categories!',
-				Categories: categories,
+				Categories: allCategories,
 			});
 		} catch (err) {
 			console.log(err);

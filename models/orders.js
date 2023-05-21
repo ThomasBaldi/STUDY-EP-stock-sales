@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
 	const Order = sequelize.define(
 		'Order',
 		{
-			State: {
+			Status: {
 				type: Sequelize.DataTypes.STRING,
 				allowNull: false,
 				defaultValue: 'in_progress',

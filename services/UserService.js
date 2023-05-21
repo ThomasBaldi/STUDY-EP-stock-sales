@@ -13,12 +13,6 @@ class UserService {
 		});
 	}
 
-	async getRoles() {
-		return this.Role.findAll({
-			where: {},
-		});
-	}
-
 	async create(username, password, email, salt) {
 		return this.User.create({
 			Username: username,
@@ -28,9 +22,29 @@ class UserService {
 		});
 	}
 
-	async getAll() {
-		return this.User.findAll({
+	async createAdmin(username, password, email, salt) {
+		return this.User.create({
+			Username: username,
+			Password: password,
+			Email: email,
+			Salt: salt,
+			Role: 1,
+		});
+	}
+
+	async getRoles() {
+		return this.Role.findAll({
 			where: {},
+		});
+	}
+
+	async getAllUsers() {
+		return this.User.findAll({
+			raw: true,
+			where: { Role: 2 },
+			attributes: {
+				exclude: ['Password', 'Salt', 'createdAt', 'updatedAt', 'Role'],
+			},
 		});
 	}
 
@@ -46,16 +60,6 @@ class UserService {
 		return await this.User.findOne({
 			raw: true,
 			where: { Username: username },
-		});
-	}
-
-	async createAdmin(username, password, email, salt) {
-		return this.User.create({
-			Username: username,
-			Password: password,
-			Email: email,
-			Salt: salt,
-			Role: 1,
 		});
 	}
 

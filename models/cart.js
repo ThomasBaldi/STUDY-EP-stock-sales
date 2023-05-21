@@ -12,10 +12,6 @@ module.exports = (sequelize, Sequelize) => {
 				allowNull: false,
 				defaultValue: 'in-progress',
 			},
-			TotalPrice: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: true,
-			},
 		},
 		{ timestamps: false }
 	);

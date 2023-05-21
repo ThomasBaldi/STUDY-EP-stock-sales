@@ -6,6 +6,7 @@ var ItemService = require('../services/Item&CategoryServ');
 var itemService = new ItemService(db);
 var CartService = require('../services/Cart&CartItemServ');
 var cartService = new CartService(db);
+
 var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
 
 let itemToCart = { message: 'The item was added to your cart.' };
@@ -17,13 +18,30 @@ router
 		try {
 			const token = req.headers.authorization.split(' ')[1];
 			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-			let cart = await cartService.getCart(decodedToken.UserId);
-			console.log(cart);
+			let UserId = decodedToken.UserId;
+			let cart = await cartService.getCart(UserId);
+			cart.ItemsInCart = [];
+			cart.Total = [];
+			let cartItems = await cartService.getUserCartItem(cart.id);
+			cartItems.forEach((e) => {
+				cart.ItemsInCart.push({
+					Name: e['Item.Name'],
+					Price: e['Item.Price'],
+					Quantity: e.Quantity,
+				});
+				cart.Total.push(e['Item.Price']);
+			});
+			if (cart.Total.length != 0) {
+				cart.Total = cart.Total.reduce((acc, curr) => acc + curr);
+			} else {
+				cart.Total = 0;
+			}
 			res.status(200).json({
 				Cart: {
 					id: cart.id,
 					Status: cart.Status,
-					Total: cart.TotalPrice,
+					Total: cart.Total,
+					ItemsInCart: cart.ItemsInCart,
 				},
 			});
 		} catch (err) {
@@ -33,7 +51,51 @@ router
 			});
 		}
 	})
-	.get('/allcarts', checkIfAdmin, async (req, res, next) => {})
+	.get(
+		'/allcarts',
+		/* checkIfAdmin, */ async (req, res, next) => {
+			try {
+				let carts = await cartService.getAllCarts();
+
+				groupedUsers = Object.values(
+					carts.reduce((a, c) => {
+						a[c['User.Username']] = a[c['User.Username']] || [];
+						a[c['User.Username']].push(c);
+						return a;
+					}, {})
+				);
+
+				var finalArray = [];
+				groupedUsers.forEach((e) => {
+					e.Cart = {
+						Username: e[0]['User.Username'],
+						CartId: e[0].id,
+						Status: e[0].Status,
+						Items: [],
+					};
+					e.forEach((x) => {
+						Item = {
+							ItemName: x['ItemCarts.Item.Name'],
+							ItemId: x['ItemCarts.Item.id'],
+							Price: x['ItemCarts.Item.Price'],
+							Quantity: x['ItemCarts.Quantity'],
+						};
+						e.Cart.Items.push(Item);
+					}),
+						finalArray.push(e.Cart);
+				});
+				console.log(groupedUsers[0].Cart);
+				res.status(200).json({
+					AllCarts: finalArray,
+				});
+			} catch (err) {
+				console.log(err);
+				res.status(400).json({
+					message: 'Something went wrong with the Cart search.',
+				});
+			}
+		}
+	)
 	.post('/cart_item', checkIfUser, async (req, res, next) => {
 		let { id, Name } = req.body;
 		const token = req.headers.authorization.split(' ')[1];
@@ -47,7 +109,7 @@ router
 			try {
 				if (id) {
 					let item = await itemService.getOneById(id);
-					let itemIsInCart = await cartService.getCartItemByItem(id);
+					let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
 					if (item) {
 						if (!itemIsInCart) {
 							cartService.createCartItem(cart.id, id);
@@ -61,7 +123,7 @@ router
 				} else if (Name) {
 					let item = await itemService.getOne(Name);
 					if (item) {
-						let itemIsInCart = await cartService.getCartItemByItem(item.id);
+						let itemIsInCart = await cartService.getCartItemByItem(cart.id, item.id);
 						if (!itemIsInCart) {
 							cartService.createCartItem(cart.id, item.id);
 							res.status(200).json(itemToCart);

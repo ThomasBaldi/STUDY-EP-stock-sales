@@ -1,11 +1,10 @@
-const { Op } = require('sequelize');
-
 class CartService {
 	constructor(db) {
 		this.client = db.sequelize;
 		this.Cart = db.Cart;
 		this.CartItem = db.ItemCart;
 		this.Item = db.Item;
+		this.User = db.User;
 	}
 
 	async createCart(userId) {
@@ -18,10 +17,28 @@ class CartService {
 		return this.Cart.findOne({
 			raw: true,
 			where: { UserId: userId },
-			include: {
-				model: this.CartItem,
-				attributes: ['ItemId'],
-			},
+		});
+	}
+
+	async getAllCarts() {
+		return this.Cart.findAll({
+			raw: true,
+			include: [
+				{
+					model: this.User,
+					attributes: ['Username'],
+				},
+				{
+					model: this.CartItem,
+					attributes: {
+						exclude: ['CartId', 'ItemId'],
+					},
+					include: {
+						model: this.Item,
+						attributes: ['Name', 'Price'],
+					},
+				},
+			],
 		});
 	}
 
@@ -31,17 +48,31 @@ class CartService {
 		return this.CartItem.create({
 			CartId: cartId,
 			ItemId: itemId,
+		});
+	}
+
+	async getUserCartItem(cartId) {
+		return this.CartItem.findAll({
+			raw: true,
+			where: {
+				CartId: cartId,
+			},
+			attributes: {
+				exclude: ['CartId', 'ItemId'],
+			},
 			include: {
 				model: this.Item,
-				attribute: ['Price'],
-				as: 'Price',
+				attributes: ['Name', 'Price'],
 			},
 		});
 	}
 
-	async getCartItemByItem(itemId) {
+	async getCartItemByItem(cartId, itemId) {
 		return this.CartItem.findOne({
-			where: { ItemId: itemId },
+			where: {
+				ItemId: itemId,
+				CartId: cartId,
+			},
 		});
 	}
 }

@@ -54,9 +54,21 @@ class ItemService {
 		return this.Item.findAll({
 			raw: true,
 			where: {},
+			attributes: {
+				exclude: [
+					'Status',
+					'SKU',
+					'Image',
+					'Quantity',
+					'CategoryId',
+					'createdAt',
+					'updatedAt',
+					'Role',
+				],
+			},
 			include: {
 				model: this.Category,
-				attributes: ['name'],
+				attributes: ['Name'],
 			},
 		});
 	}
@@ -117,6 +129,9 @@ class ItemService {
 		return this.Category.findAll({
 			raw: true,
 			where: {},
+			attributes: {
+				exclude: ['createdAt', 'updatedAt'],
+			},
 		});
 	}
 
