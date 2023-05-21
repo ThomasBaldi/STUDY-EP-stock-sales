@@ -33,7 +33,7 @@ router
 		} else {
 			itemService.createNewCat(Name);
 			res.status(200).json({
-				message: `${Name} was succesfully added to the categories list.`,
+				message: `${Name} was successfully added to the categories list.`,
 			});
 		}
 	})
@@ -51,7 +51,7 @@ router
 				} else {
 					itemService.updateCat(id, Name);
 					res.status(200).json({
-						message: `Category with id: ${id} was succesfully updated to ${Name}.`,
+						message: `Category with id: ${id} was successfully updated to ${Name}.`,
 					});
 				}
 			}
@@ -67,7 +67,7 @@ router
 			if (categoryInUse.length == 0) {
 				itemService.deleteCat(id);
 				res.status(200).json({
-					message: `Category with id ${id} was succesfully deleted.`,
+					message: `Category with id ${id} was successfully deleted.`,
 				});
 			} else {
 				res.status(400).json({

@@ -53,7 +53,7 @@ router
 		} else {
 			itemService.createNew(Name, Price, SKU, Quantity, Image, Category);
 			res.status(200).json({
-				message: `${Name} was succesfully added to the items list.`,
+				message: `${Name} was successfully added to the items list.`,
 			});
 		}
 	})
@@ -96,7 +96,7 @@ router
 				} else {
 					itemService.updateItem(id, req.body);
 					res.status(200).json({
-						message: `Item with id: ${id} was succesfully updated.`,
+						message: `Item with id: ${id} was successfully updated.`,
 					});
 				}
 			}
@@ -110,7 +110,7 @@ router
 		if (idExists) {
 			itemService.deleteItem(id);
 			res.status(200).json({
-				message: `Item with id ${id} was succesfully deleted.`,
+				message: `Item with id ${id} was successfully deleted.`,
 			});
 		} else {
 			res.status(400).json(idMsg);

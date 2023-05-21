@@ -11,7 +11,8 @@ var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware
 
 let itemToCart = { message: 'The item was added to your cart.' };
 let itemAlready = { message: 'This item is already in your cart.' };
-let noSuchItem = { message: 'There is no such Item to be purchased.' };
+let noSuchItem = { message: 'There is no such item to be purchased.' };
+let noSuchItemInCart = { message: 'There is no such item in your cart.' };
 
 router
 	.get('/', checkIfUser, async (req, res, next) => {
@@ -26,6 +27,7 @@ router
 			cartItems.forEach((e) => {
 				cart.ItemsInCart.push({
 					Name: e['Item.Name'],
+					Id: e.ItemId,
 					Price: e['Item.Price'],
 					Quantity: e.Quantity,
 				});
@@ -51,51 +53,48 @@ router
 			});
 		}
 	})
-	.get(
-		'/allcarts',
-		/* checkIfAdmin, */ async (req, res, next) => {
-			try {
-				let carts = await cartService.getAllCarts();
+	.get('/allcarts', checkIfAdmin, async (req, res, next) => {
+		try {
+			let carts = await cartService.getAllCarts();
 
-				groupedUsers = Object.values(
-					carts.reduce((a, c) => {
-						a[c['User.Username']] = a[c['User.Username']] || [];
-						a[c['User.Username']].push(c);
-						return a;
-					}, {})
-				);
+			groupedUsers = Object.values(
+				carts.reduce((a, c) => {
+					a[c['User.Username']] = a[c['User.Username']] || [];
+					a[c['User.Username']].push(c);
+					return a;
+				}, {})
+			);
 
-				var finalArray = [];
-				groupedUsers.forEach((e) => {
-					e.Cart = {
-						Username: e[0]['User.Username'],
-						CartId: e[0].id,
-						Status: e[0].Status,
-						Items: [],
+			var finalArray = [];
+			groupedUsers.forEach((e) => {
+				e.Cart = {
+					Username: e[0]['User.Username'],
+					CartId: e[0].id,
+					Status: e[0].Status,
+					Items: [],
+				};
+				e.forEach((x) => {
+					Item = {
+						ItemName: x['ItemCarts.Item.Name'],
+						ItemId: x['ItemCarts.Item.id'],
+						Price: x['ItemCarts.Item.Price'],
+						Quantity: x['ItemCarts.Quantity'],
 					};
-					e.forEach((x) => {
-						Item = {
-							ItemName: x['ItemCarts.Item.Name'],
-							ItemId: x['ItemCarts.Item.id'],
-							Price: x['ItemCarts.Item.Price'],
-							Quantity: x['ItemCarts.Quantity'],
-						};
-						e.Cart.Items.push(Item);
-					}),
-						finalArray.push(e.Cart);
-				});
-				console.log(groupedUsers[0].Cart);
-				res.status(200).json({
-					AllCarts: finalArray,
-				});
-			} catch (err) {
-				console.log(err);
-				res.status(400).json({
-					message: 'Something went wrong with the Cart search.',
-				});
-			}
+					e.Cart.Items.push(Item);
+				}),
+					finalArray.push(e.Cart);
+			});
+			console.log(groupedUsers[0].Cart);
+			res.status(200).json({
+				AllCarts: finalArray,
+			});
+		} catch (err) {
+			console.log(err);
+			res.status(400).json({
+				message: 'Something went wrong with the Cart search.',
+			});
 		}
-	)
+	})
 	.post('/cart_item', checkIfUser, async (req, res, next) => {
 		let { id, Name } = req.body;
 		const token = req.headers.authorization.split(' ')[1];
@@ -142,7 +141,37 @@ router
 			}
 		}
 	})
-	.put('/cart_item/:id', checkIfUser, async (req, res, next) => {})
+	.put('/cart_item/:id', checkIfUser, async (req, res, next) => {
+		let quant = req.body.Quantity;
+		let id = req.params.id;
+		const token = req.headers.authorization.split(' ')[1];
+		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		let cart = await cartService.getCart(decodedToken.UserId);
+		if (!quant) {
+			res.status(400).json({
+				message: 'A new quantity for the item must be provided.',
+			});
+		} else {
+			try {
+				if (id) {
+					let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
+					if (!itemIsInCart) {
+						res.status(400).json(noSuchItemInCart);
+					} else {
+						cartService.updateQuantity(id, cart.id, quant);
+						res.status(200).json({
+							message: `Quantity for item with id ${id} was successfully updated to ${quant}.`,
+						});
+					}
+				}
+			} catch (err) {
+				console.log(err);
+				res.status(400).json({
+					message: 'Something went wrong with the cart item search.',
+				});
+			}
+		}
+	})
 	.delete('/:id', checkIfUser, async (req, res, next) => {})
 	.delete('/cart_item/:id', checkIfUser, async (req, res, next) => {});
 

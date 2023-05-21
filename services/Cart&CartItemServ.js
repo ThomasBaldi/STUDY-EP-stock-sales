@@ -58,7 +58,7 @@ class CartService {
 				CartId: cartId,
 			},
 			attributes: {
-				exclude: ['CartId', 'ItemId'],
+				exclude: ['CartId'],
 			},
 			include: {
 				model: this.Item,
@@ -69,11 +69,24 @@ class CartService {
 
 	async getCartItemByItem(cartId, itemId) {
 		return this.CartItem.findOne({
+			raw: true,
 			where: {
 				ItemId: itemId,
 				CartId: cartId,
 			},
 		});
+	}
+
+	async updateQuantity(itemId, cartId, quantity) {
+		return this.CartItem.update(
+			{ Quantity: quantity },
+			{
+				where: {
+					CartId: cartId,
+					ItemId: itemId,
+				},
+			}
+		);
 	}
 }
 

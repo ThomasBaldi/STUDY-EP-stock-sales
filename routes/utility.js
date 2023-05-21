@@ -91,7 +91,7 @@ router
 			}
 
 			res.status(200).json({
-				message: 'Roles, Admin user, Categories and Items from API are succesfully added to DB.',
+				message: 'Roles, Admin user, Categories and Items from API are successfully added to DB.',
 			});
 		} else {
 			res.status(300).json({ message: 'All setup data has already been added to DB' });

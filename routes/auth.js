@@ -36,7 +36,7 @@ router.post('/signup', async (req, res, next) => {
 			try {
 				userService.create(Username, hash, Email, salt);
 				res.status(200).json({
-					message: `User with Username: ${Username} is created.`,
+					message: `User with Username: ${Username} was successfully created.`,
 				});
 			} catch (err) {
 				console.log(err);
