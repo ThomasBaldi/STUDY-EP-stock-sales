@@ -16,7 +16,6 @@ router
 		const existsItems = await itemService.getAll();
 		var items = [];
 		var categories = [];
-
 		//get the data and add push it to the arrays
 		await axios.get('http://143.42.108.232:8888/items/stock').then((res) => {
 			//items array
@@ -29,12 +28,10 @@ router
 				}
 			});
 		});
-
 		//create objects array of the strings array
 		let newCategories = categories.map((name, id = 1) => {
 			return { name: name, id: id + 1 };
 		});
-
 		//switch categoryName with categoryId
 		items.map((e) => {
 			var result = newCategories.filter((x) => x.name == e.category);
@@ -43,7 +40,6 @@ router
 			}
 			return e;
 		});
-
 		//populate all tables if no data is stored!
 		if (
 			existRoles.length == 0 ||
@@ -55,7 +51,6 @@ router
 				//roles
 				userService.createRole('Admin');
 				userService.createRole('User');
-
 				//Admin user
 				let salt = crypto.randomBytes(16);
 				crypto.pbkdf2('P@ssword2023', salt, 310000, 32, 'sha256', (err, hash) => {
@@ -69,10 +64,8 @@ router
 						});
 					}
 				});
-
 				//categories
 				newCategories.forEach((e) => itemService.createCat(e.id, e.name));
-
 				//items
 				items.forEach((e) => {
 					itemService.create(
@@ -89,7 +82,6 @@ router
 				console.log(err);
 				res.status(400).json({ message: 'Something went wrong with the setup.' });
 			}
-
 			res.status(200).json({
 				message: 'Roles, Admin user, Categories and Items from API are successfully added to DB.',
 			});

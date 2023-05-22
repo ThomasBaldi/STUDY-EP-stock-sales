@@ -44,6 +44,13 @@ class ItemService {
 		});
 	}
 
+	async getItem(body) {
+		return this.Item.findOne({
+			raw: true,
+			where: body,
+		});
+	}
+
 	async getSKU(sku) {
 		return this.Item.findOne({
 			where: { SKU: sku },

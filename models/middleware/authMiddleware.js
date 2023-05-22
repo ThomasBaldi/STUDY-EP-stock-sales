@@ -11,7 +11,7 @@ module.exports = {
 		}
 		const decodedToken = jwt.verify(token.split(' ')[1], process.env.TOKEN_SECRET);
 
-		if (decodedToken.userId !== 1) {
+		if (decodedToken.UserId != 1) {
 			res.status(400).json({
 				message: 'Only Admin user has access to this endpoint',
 			});

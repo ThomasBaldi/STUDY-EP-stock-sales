@@ -12,7 +12,9 @@ var authRouter = require('./routes/auth');
 var utilityRouter = require('./routes/utility');
 var itemsRouter = require('./routes/items');
 var categoriesRouter = require('./routes/categories');
+
 var cartRouter = require('./routes/cart');
+var cartItemRouter = require('./routes/cart_Items');
 
 var app = express();
 
@@ -28,10 +30,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', authRouter);
-app.use('/utility', utilityRouter);
-app.use('/items', itemsRouter);
-app.use('/categories', categoriesRouter);
-app.use('/cart', cartRouter);
+app.use('/', utilityRouter);
+app.use('/', itemsRouter);
+app.use('/', categoriesRouter);
+app.use('/', cartRouter);
+app.use('/cart_item', cartItemRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,8 +1,10 @@
+const { sequelize } = require('../models');
+
 class CartService {
 	constructor(db) {
 		this.client = db.sequelize;
 		this.Cart = db.Cart;
-		this.CartItem = db.ItemCart;
+		this.CartItem = db.CartItem;
 		this.Item = db.Item;
 		this.User = db.User;
 	}
@@ -17,6 +19,13 @@ class CartService {
 		return this.Cart.findOne({
 			raw: true,
 			where: { UserId: userId },
+		});
+	}
+
+	async getCartById(id) {
+		return this.Cart.findOne({
+			raw: true,
+			where: { id: id },
 		});
 	}
 
@@ -42,12 +51,26 @@ class CartService {
 		});
 	}
 
+	async getAllCartsQuery() {
+		return (
+			this.Cart.findAll({ where: {} }),
+			sequelize
+				.query(
+					'SELECT users.Username AS `Username`, carts.Status AS Status, carts.id AS `CartId`, cartitems.ItemID AS `ItemId`, items.Name AS `Name`, cartitems.Price AS `Price`, cartitems.Quantity AS `Quantity` FROM users JOIN carts ON users.id = carts.UserId JOIN cartitems ON carts.id = cartitems.CartId JOIN items ON cartitems.ItemId = items.id'
+				)
+				.catch((err) => {
+					return err;
+				})
+		);
+	}
+
 	//cartitem methods----------------------------------------------
 
-	async createCartItem(cartId, itemId) {
+	async createCartItem(cartId, itemId, price) {
 		return this.CartItem.create({
 			CartId: cartId,
 			ItemId: itemId,
+			Price: price,
 		});
 	}
 
@@ -62,7 +85,18 @@ class CartService {
 			},
 			include: {
 				model: this.Item,
-				attributes: ['Name', 'Price'],
+				attributes: ['Name'],
+			},
+		});
+	}
+
+	async getOrCreateItem(cartId, itemId, itemPrice) {
+		return this.CartItem.findOrCreate({
+			raw: true,
+			where: {
+				CartId: cartId,
+				ItemId: itemId,
+				Price: itemPrice,
 			},
 		});
 	}
@@ -94,6 +128,14 @@ class CartService {
 			where: {
 				CartId: cartId,
 				ItemId: itemId,
+			},
+		});
+	}
+
+	async deleteAllCartItems(cartId) {
+		return this.CartItem.destroy({
+			where: {
+				CartId: cartId,
 			},
 		});
 	}

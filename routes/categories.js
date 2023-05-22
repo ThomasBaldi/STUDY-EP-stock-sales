@@ -10,7 +10,7 @@ let categoryMsg = { message: 'Category id does not exist.' };
 let categoryNameMsg = { message: 'A new category name must be provided.' };
 
 router
-	.get('/', async (req, res, next) => {
+	.get('/categories', async (req, res, next) => {
 		try {
 			let allCategories = await itemService.getAllCat();
 			res.status(200).json({
@@ -22,7 +22,7 @@ router
 			res.status(400).json('Something went wrong with the request.');
 		}
 	})
-	.post('/', checkIfAdmin, async (req, res, next) => {
+	.post('/category', checkIfAdmin, async (req, res, next) => {
 		let Name = req.body.Name;
 		let nameExists = await itemService.getOneCat(Name);
 		if (!Name) {
@@ -37,7 +37,7 @@ router
 			});
 		}
 	})
-	.put('/:id', checkIfAdmin, async (req, res, next) => {
+	.put('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let Name = req.body.Name;
 		let id = req.params.id;
 		let nameExists = await itemService.getOneCat(Name);
@@ -59,7 +59,7 @@ router
 			res.status(400).json(categoryMsg);
 		}
 	})
-	.delete('/:id', checkIfAdmin, async (req, res, next) => {
+	.delete('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
 		let idExists = await itemService.getOneCatById(id);
 		let categoryInUse = await itemService.getAllByCat(id);

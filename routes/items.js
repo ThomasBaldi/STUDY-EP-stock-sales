@@ -8,7 +8,7 @@ var { checkIfAdmin } = require('../models/middleware/authMiddleware');
 let idMsg = { message: 'There is no item matching such Id.' };
 let nameMsg = { message: 'Item name already exists.' };
 let priceMsg = { message: 'Price must be a number.' };
-let skuMsg = { message: 'Item SKU already exists.' };
+let skuMsg = { message: 'Item SKU already exists in another item.' };
 let regMsg = { message: 'SKU has to be 2 capital letters and 3 numbers.' };
 let categoryMsg = { message: 'Category id does not exist.' };
 let quantityMsg = { message: 'Quantity is either missing or set to 0.' };
@@ -16,7 +16,7 @@ let quantityMsg = { message: 'Quantity is either missing or set to 0.' };
 let skuRegex = /^[A-Z]{2}\d{3}$/;
 
 router
-	.get('/', async (req, res, next) => {
+	.get('/items', async (req, res, next) => {
 		try {
 			let allItems = await itemService.getAll();
 			res.status(200).json({
@@ -28,7 +28,7 @@ router
 			res.status(400).json('Something went wrong with the request.');
 		}
 	})
-	.post('/', checkIfAdmin, async (req, res, next) => {
+	.post('/item', checkIfAdmin, async (req, res, next) => {
 		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
 		let nameExists = await itemService.getOne(Name);
 		let skuExists = await itemService.getSKU(SKU);
@@ -57,7 +57,7 @@ router
 			});
 		}
 	})
-	.put('/:id', checkIfAdmin, async (req, res, next) => {
+	.put('/item/:id', checkIfAdmin, async (req, res, next) => {
 		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
 		let id = req.params.id;
 		let nameExists;
@@ -87,7 +87,7 @@ router
 					res.status(400).json(priceMsg);
 				} else if (skuExists) {
 					res.status(400).json(skuMsg);
-				} else if (!SKU.match(skuRegex)) {
+				} else if (SKU && !SKU.match(skuRegex)) {
 					res.status(400).json(regMsg);
 				} else if (Category && !categoryExists) {
 					res.status(400).json(categoryMsg);
@@ -104,7 +104,7 @@ router
 			res.status(400).json(idMsg);
 		}
 	})
-	.delete('/:id', checkIfAdmin, async (req, res, next) => {
+	.delete('/item/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
 		let idExists = await itemService.getOneById(id);
 		if (idExists) {

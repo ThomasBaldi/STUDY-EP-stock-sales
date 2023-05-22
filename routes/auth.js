@@ -26,7 +26,7 @@ router.post('/signup', async (req, res, next) => {
 			res.status(400).json({ message: 'Username already exists' });
 		}
 	} else if (tooManyEmails.length != 0) {
-		if (tooManyEmails.length >= 4) {
+		if (tooManyEmails.length > 4) {
 			res.status(400).json({ message: 'Email address has already been used on 4 accounts!' });
 		}
 	} else {

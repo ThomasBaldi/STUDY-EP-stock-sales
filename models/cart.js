@@ -18,8 +18,8 @@ module.exports = (sequelize, Sequelize) => {
 
 	Cart.associate = function (models) {
 		Cart.belongsTo(models.User, { foreignKey: 'UserId', allowNull: false });
-		Cart.belongsToMany(models.Item, { through: models.ItemCart, foreignKey: 'CartId' });
-		Cart.hasMany(models.ItemCart);
+		Cart.belongsToMany(models.Item, { through: models.CartItem, foreignKey: 'CartId' });
+		Cart.hasMany(models.CartItem);
 	};
 	return Cart;
 };
