@@ -64,6 +64,17 @@ class CartService {
 		);
 	}
 
+	async checkOutCart(cartId) {
+		return this.Cart.update(
+			{ Status: 'checked-out' },
+			{
+				where: {
+					id: cartId,
+				},
+			}
+		);
+	}
+
 	//cartitem methods----------------------------------------------
 
 	async createCartItem(cartId, itemId, price) {

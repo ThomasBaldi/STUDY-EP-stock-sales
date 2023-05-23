@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
+var jwt = require('jsonwebtoken');
 var ItemService = require('../services/Item&CategoryServ');
 var itemService = new ItemService(db);
 var { checkIfAdmin } = require('../models/middleware/authMiddleware');
@@ -19,10 +20,25 @@ router
 	.get('/items', async (req, res, next) => {
 		try {
 			let allItems = await itemService.getAll();
-			res.status(200).json({
-				message: 'All available items!',
-				Items: allItems,
+			var availableItems = [];
+			allItems.forEach((e) => {
+				if (e.Quantity > 0) {
+					availableItems.push(e);
+				}
 			});
+			//Guest Users can only view in-stock items. (items catalogue rule)
+			if ((token = req.headers.authorization == undefined)) {
+				res.status(200).json({
+					message: 'All available items!',
+					Items: availableItems,
+				});
+				//rest can see them all (items endpoints rule)
+			} else if ((token = req.headers.authorization.split(' ')[1])) {
+				res.status(200).json({
+					message: 'All available items!',
+					Items: allItems,
+				});
+			}
 		} catch (err) {
 			console.log(err);
 			res.status(400).json('Something went wrong with the request.');

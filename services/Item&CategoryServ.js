@@ -62,16 +62,7 @@ class ItemService {
 			raw: true,
 			where: {},
 			attributes: {
-				exclude: [
-					'Status',
-					'SKU',
-					'Image',
-					'Quantity',
-					'CategoryId',
-					'createdAt',
-					'updatedAt',
-					'Role',
-				],
+				exclude: ['Status', 'SKU', 'Image', 'CategoryId', 'createdAt', 'updatedAt', 'Role'],
 			},
 			include: {
 				model: this.Category,
