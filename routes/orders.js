@@ -3,10 +3,12 @@ var router = express.Router();
 var db = require('../models');
 var jwt = require('jsonwebtoken');
 var UserService = require('../services/UserService');
+var ItemService = require('../services/Item&CategoryServ');
 var CartService = require('../services/Cart&CartItemServ');
 var OrderService = require('../services/Order&OrderItemServ');
-var cartService = new CartService(db);
 var userService = new UserService(db);
+var cartService = new CartService(db);
+var itemService = new ItemService(db);
 var orderService = new OrderService(db);
 
 var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
@@ -30,7 +32,7 @@ router
 			let UserId = decodedToken.UserId;
 			let cart = await cartService.getCart(UserId);
 			let itemsExistInCart = await cartService.getUserCartItem(cart.id);
-			/* console.log(itemsExistInCart); */
+
 			if (itemsExistInCart.length == 0) {
 				res.status(400).json({
 					message: 'Cannot checkout, there is no item in your cart yet.',
@@ -38,30 +40,55 @@ router
 			} else {
 				await cartService.checkOutCart(cart.id);
 				var Total = [];
-				itemsExistInCart.forEach((e) => {
+				itemsExistInCart.forEach(async (e) => {
 					Total.push(e.Price);
 				});
-				Total = Total.reduce((acc, curr) => acc + curr);
-				if (discount) {
-					var Discount = discount * 100 + '%';
-					var FinalTotal = Total - Total * discount;
-				} else {
-					var FinalTotal = Total;
-				}
-				await orderService.createOrder(decodedToken.UserId, FinalTotal);
-				let order = await orderService.getLastUserOrder(decodedToken.UserId);
+				//check stock availability
+				var lowStock = [];
+				await Promise.all(
+					itemsExistInCart.map(async (e) => {
+						let item = await itemService.getLowQuantItem(e.ItemId, e.Quantity);
+						if (item != null) {
+							lowStock.push(item);
+						}
+					})
+				);
+				if (lowStock.length != 0) {
+					let items = [];
+					lowStock.forEach((e) => {
+						items.push({ Name: e.Name, ID: e.id, AvailableQuantity: e.Quantity });
+					});
 
-				//give discount if available
-				//create orderId and send it via POST /order/:id
-				//together with the cartItems
-				//that endpoint will create all orderItems
-				res.status(200).json({
-					message: 'Cart has been checked-out and order is placed!',
-					OrderId: order.id,
-					TotalPrice: Total,
-					Discount: Discount,
-					FinalPrice: FinalTotal,
-				});
+					res.status(400).json({
+						Message:
+							'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed your checkout.',
+						Items: items,
+					});
+				} else {
+					//get cart total and give discount if available
+					Total = Total.reduce((acc, curr) => acc + curr);
+					if (discount) {
+						var Discount = discount * 100 + '%';
+						var FinalTotal = Total - Total * discount;
+					} else {
+						var FinalTotal = Total;
+					}
+					/* await orderService.createOrder(decodedToken.UserId, FinalTotal); */
+
+					let order = await orderService.getLastUserOrder(decodedToken.UserId);
+					/* console.log(itemsExistInCart); */
+
+					//create orderId and send it via POST /order/:id
+					//together with the cartItems
+					//that endpoint will create all orderItems
+					res.status(200).json({
+						message: 'Cart has been checked-out and order is placed!',
+						OrderId: order.id,
+						TotalPrice: Total,
+						Discount: Discount,
+						FinalPrice: FinalTotal,
+					});
+				}
 			}
 		} catch (err) {
 			console.log(err);

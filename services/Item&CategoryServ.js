@@ -78,6 +78,18 @@ class ItemService {
 		});
 	}
 
+	async getLowQuantItem(id, quantity) {
+		return this.Item.findOne({
+			raw: true,
+			where: {
+				id: id,
+				Quantity: {
+					[Op.lt]: quantity,
+				},
+			},
+		});
+	}
+
 	async updateItem(id, body) {
 		return this.Item.update(body, {
 			where: {

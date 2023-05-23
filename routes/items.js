@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var jwt = require('jsonwebtoken');
 var ItemService = require('../services/Item&CategoryServ');
 var itemService = new ItemService(db);
 var { checkIfAdmin } = require('../models/middleware/authMiddleware');

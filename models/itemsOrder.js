@@ -2,6 +2,10 @@ module.exports = (sequelize, Sequelize) => {
 	const OrderItem = sequelize.define(
 		'OrderItem',
 		{
+			Name: {
+				type: Sequelize.DataTypes.STRING,
+				allowNull: false,
+			},
 			Price: {
 				type: Sequelize.DataTypes.INTEGER,
 				allowNull: false,
@@ -9,7 +13,6 @@ module.exports = (sequelize, Sequelize) => {
 			Quantity: {
 				type: Sequelize.DataTypes.INTEGER,
 				allowNull: false,
-				defaultValue: 1,
 			},
 		},
 		{ timestamps: false }

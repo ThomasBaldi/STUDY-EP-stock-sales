@@ -21,6 +21,12 @@ class OrderService {
 			order: [['id', 'DESC']],
 		});
 	}
+
+	//order items methods -----------
+
+	async createOrderItems() {
+		return this.OrderItem.bulkCreate({});
+	}
 }
 
 module.exports = OrderService;
