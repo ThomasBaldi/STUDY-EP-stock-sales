@@ -30,14 +30,14 @@ class ItemService {
 		});
 	}
 
-	async getOne(name) {
+	async itemByName(name) {
 		return this.Item.findOne({
 			raw: true,
 			where: { Name: name },
 		});
 	}
 
-	async getOneById(id) {
+	async itemById(id) {
 		return this.Item.findOne({
 			raw: true,
 			where: { id: id },
@@ -112,20 +112,20 @@ class ItemService {
 		});
 	}
 
-	async createNewCat(name) {
-		return this.Category.create({
-			Name: name,
+	async findOrCreateCat(name) {
+		return this.Category.findOrCreate({
+			where: { Name: name },
 		});
 	}
 
-	async getOneCatById(id) {
+	async catById(id) {
 		return this.Category.findOne({
 			raw: true,
 			where: { id: id },
 		});
 	}
 
-	async getOneCat(name) {
+	async catByName(name) {
 		return this.Category.findOne({
 			raw: true,
 			where: { Name: name },

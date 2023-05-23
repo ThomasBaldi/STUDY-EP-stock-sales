@@ -10,8 +10,8 @@ class CartService {
 	}
 
 	async createCart(userId) {
-		return this.Cart.create({
-			UserId: userId,
+		return this.Cart.findOrCreate({
+			where: { UserId: userId },
 		});
 	}
 
@@ -90,7 +90,7 @@ class CartService {
 		});
 	}
 
-	async getOrCreateItem(cartId, itemId, itemPrice) {
+	async getOrCreateCartItem(cartId, itemId, itemPrice) {
 		return this.CartItem.findOrCreate({
 			raw: true,
 			where: {

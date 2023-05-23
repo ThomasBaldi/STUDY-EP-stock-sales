@@ -24,24 +24,24 @@ router
 	})
 	.post('/category', checkIfAdmin, async (req, res, next) => {
 		let Name = req.body.Name;
-		let nameExists = await itemService.getOneCat(Name);
 		if (!Name) {
 			res.status(400).json(categoryNameMsg);
-		}
-		if (nameExists) {
-			res.status(400).json(nameMsg);
 		} else {
-			itemService.createNewCat(Name);
-			res.status(200).json({
-				message: `${Name} was successfully added to the categories list.`,
-			});
+			let newCat = await itemService.findOrCreateCat(Name);
+			if (newCat[1] == true) {
+				res.status(200).json({
+					message: `${Name} was successfully added to the categories list.`,
+				});
+			} else if (newCat[1] == false) {
+				res.status(400).json(nameMsg);
+			}
 		}
 	})
 	.put('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let Name = req.body.Name;
 		let id = req.params.id;
-		let nameExists = await itemService.getOneCat(Name);
-		let idExists = await itemService.getOneCatById(id);
+		let nameExists = await itemService.catByName(Name);
+		let idExists = await itemService.catById(id);
 		if (idExists) {
 			if (!Name) {
 				res.status(400).json(categoryNameMsg);
@@ -61,7 +61,7 @@ router
 	})
 	.delete('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
-		let idExists = await itemService.getOneCatById(id);
+		let idExists = await itemService.catById(id);
 		let categoryInUse = await itemService.getAllByCat(id);
 		if (idExists) {
 			if (categoryInUse.length == 0) {

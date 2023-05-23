@@ -16,7 +16,7 @@ router
 		const existsItems = await itemService.getAll();
 		var items = [];
 		var categories = [];
-		//get the data and add push it to the arrays
+		//get the data and push it to the arrays
 		await axios.get('http://143.42.108.232:8888/items/stock').then((res) => {
 			//items array
 			let data = res.data.data;

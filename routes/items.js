@@ -30,9 +30,9 @@ router
 	})
 	.post('/item', checkIfAdmin, async (req, res, next) => {
 		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
-		let nameExists = await itemService.getOne(Name);
+		let nameExists = await itemService.itemByName(Name);
 		let skuExists = await itemService.getSKU(SKU);
-		let categoryExists = await itemService.getOneCatById(Category);
+		let categoryExists = await itemService.catById(Category);
 		if (!Name || !Price || !SKU || !Category) {
 			res.status(400).json({
 				message: 'One or more mandatory fields are missing.',
@@ -58,21 +58,21 @@ router
 		}
 	})
 	.put('/item/:id', checkIfAdmin, async (req, res, next) => {
-		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
+		let { Name, Price, SKU, Quantity, Category } = req.body;
 		let id = req.params.id;
 		let nameExists;
 		let skuExists;
 		let categoryExists;
-		let idExists = await itemService.getOneById(id);
+		let idExists = await itemService.itemById(id);
 		//since they depend on which attribute is sent
 		if (Name) {
-			nameExists = await itemService.getOne(Name);
+			nameExists = await itemService.itemByName(Name);
 		}
 		if (SKU) {
 			skuExists = await itemService.getSKU(SKU);
 		}
 		if (Category) {
-			categoryExists = await itemService.getOneCatById(Category);
+			categoryExists = await itemService.catById(Category);
 		}
 		//when id exists, validate req.body and attributes and then update
 		if (idExists) {
@@ -106,7 +106,7 @@ router
 	})
 	.delete('/item/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
-		let idExists = await itemService.getOneById(id);
+		let idExists = await itemService.itemById(id);
 		if (idExists) {
 			itemService.deleteItem(id);
 			res.status(200).json({

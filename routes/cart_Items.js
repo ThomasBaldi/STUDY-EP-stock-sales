@@ -28,7 +28,7 @@ router
 			try {
 				let item = await itemService.getItem(body);
 				if (item) {
-					let cartItem = await cartService.getOrCreateItem(cart.id, item.id, item.Price);
+					let cartItem = await cartService.getOrCreateCartItem(cart.id, item.id, item.Price);
 					if (cartItem[1] == true) {
 						res.status(200).json(itemToCart);
 					}
@@ -60,7 +60,7 @@ router
 			try {
 				if (id) {
 					let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
-					let itemStock = await itemService.getOneById(id);
+					let itemStock = await itemService.itemById(id);
 					if (!itemIsInCart) {
 						res.status(400).json(noSuchItemInCart);
 					} else {

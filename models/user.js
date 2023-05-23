@@ -31,7 +31,8 @@ module.exports = (sequelize, Sequelize) => {
 			defaultValue: Sequelize.fn('NOW'),
 		},
 	});
-	//triggers only on insertions through endpoints, not through raw queries on workbench
+	/* extra protection in case the api fails and tries to allow for more 
+	than the allowed duplicate amounts */
 	User.addHook('beforeCreate', async (user) => {
 		const count = await sequelize.models.User.count({ where: { Email: user.Email } });
 		if (count >= 4) {

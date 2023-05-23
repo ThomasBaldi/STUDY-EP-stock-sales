@@ -50,6 +50,7 @@ class UserService {
 
 	async getAllEmails(email) {
 		return this.User.findAll({
+			raw: true,
 			where: {
 				Email: email,
 			},
