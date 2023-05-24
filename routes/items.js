@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var db = require('../models');
 var ItemService = require('../services/Item&CategoryServ');
-var itemService = new ItemService(db);
+var itemSer = new ItemService(db);
 var { checkIfAdmin } = require('../models/middleware/authMiddleware');
 
 let idMsg = { message: 'There is no item matching such Id.' };
@@ -18,7 +18,7 @@ let skuRegex = /^[A-Z]{2}\d{3}$/;
 router
 	.get('/items', async (req, res, next) => {
 		try {
-			let allItems = await itemService.getAll();
+			let allItems = await itemSer.getAll();
 			var availableItems = [];
 			allItems.forEach((e) => {
 				if (e.Quantity > 0) {
@@ -45,9 +45,9 @@ router
 	})
 	.post('/item', checkIfAdmin, async (req, res, next) => {
 		let { Name, Price, SKU, Quantity, Image, Category } = req.body;
-		let nameExists = await itemService.itemByName(Name);
-		let skuExists = await itemService.getSKU(SKU);
-		let categoryExists = await itemService.catById(Category);
+		let nameExists = await itemSer.itemByName(Name);
+		let skuExists = await itemSer.getSKU(SKU);
+		let categoryExists = await itemSer.catById(Category);
 		if (!Name || !Price || !SKU || !Category) {
 			res.status(400).json({
 				message: 'One or more mandatory fields are missing.',
@@ -66,7 +66,7 @@ router
 		} else if (!Quantity || Quantity <= 0) {
 			res.status(400).json(quantityMsg);
 		} else {
-			itemService.createNew(Name, Price, SKU, Quantity, Image, Category);
+			itemSer.createNew(Name, Price, SKU, Quantity, Image, Category);
 			res.status(200).json({
 				message: `${Name} was successfully added to the items list.`,
 			});
@@ -78,16 +78,16 @@ router
 		let nameExists;
 		let skuExists;
 		let categoryExists;
-		let idExists = await itemService.itemById(id);
+		let idExists = await itemSer.itemById(id);
 		//since they depend on which attribute is sent
 		if (Name) {
-			nameExists = await itemService.itemByName(Name);
+			nameExists = await itemSer.itemByName(Name);
 		}
 		if (SKU) {
-			skuExists = await itemService.getSKU(SKU);
+			skuExists = await itemSer.getSKU(SKU);
 		}
 		if (Category) {
-			categoryExists = await itemService.catById(Category);
+			categoryExists = await itemSer.catById(Category);
 		}
 		//when id exists, validate req.body and attributes and then update
 		if (idExists) {
@@ -109,7 +109,7 @@ router
 				} else if (Quantity <= 0) {
 					res.status(400).json(quantityMsg);
 				} else {
-					itemService.updateItem(id, req.body);
+					itemSer.updateItem(id, req.body);
 					res.status(200).json({
 						message: `Item with id: ${id} was successfully updated.`,
 					});
@@ -121,9 +121,9 @@ router
 	})
 	.delete('/item/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
-		let idExists = await itemService.itemById(id);
+		let idExists = await itemSer.itemById(id);
 		if (idExists) {
-			itemService.deleteItem(id);
+			itemSer.deleteItem(id);
 			res.status(200).json({
 				message: `Item with id ${id} was successfully deleted.`,
 			});

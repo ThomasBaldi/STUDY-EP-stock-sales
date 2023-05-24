@@ -15,21 +15,14 @@ class CartService {
 		});
 	}
 
-	async getCart(userId) {
+	async getOne(userId) {
 		return this.Cart.findOne({
 			raw: true,
 			where: { UserId: userId },
 		});
 	}
 
-	async getCartById(id) {
-		return this.Cart.findOne({
-			raw: true,
-			where: { id: id },
-		});
-	}
-
-	async getAllCarts() {
+	async getAll() {
 		return this.Cart.findAll({
 			raw: true,
 			include: [
@@ -51,7 +44,7 @@ class CartService {
 		});
 	}
 
-	async getAllCartsQuery() {
+	async getAllQuery() {
 		return (
 			this.Cart.findAll({ where: {} }),
 			sequelize
@@ -61,17 +54,6 @@ class CartService {
 				.catch((err) => {
 					return err;
 				})
-		);
-	}
-
-	async checkOutCart(cartId) {
-		return this.Cart.update(
-			{ Status: 'checked-out' },
-			{
-				where: {
-					id: cartId,
-				},
-			}
 		);
 	}
 

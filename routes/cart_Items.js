@@ -3,9 +3,9 @@ var router = express.Router();
 var db = require('../models');
 var jwt = require('jsonwebtoken');
 var ItemService = require('../services/Item&CategoryServ');
-var itemService = new ItemService(db);
+var itemSer = new ItemService(db);
 var CartService = require('../services/Cart&CartItemServ');
-var cartService = new CartService(db);
+var cartSer = new CartService(db);
 
 var { checkIfUser } = require('../models/middleware/authMiddleware');
 
@@ -19,16 +19,16 @@ router
 		let body = req.body;
 		const token = req.headers.authorization.split(' ')[1];
 		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-		let cart = await cartService.getCart(decodedToken.UserId);
+		let cart = decodedToken.Cart;
 		if (!body) {
 			res.status(400).json({
 				message: 'Either Name or id of the item you want to add to the cart must be provided.',
 			});
 		} else {
 			try {
-				let item = await itemService.getItem(body);
+				let item = await itemSer.getItem(body);
 				if (item) {
-					let cartItem = await cartService.getOrCreateCartItem(cart.id, item.id, item.Price);
+					let cartItem = await cartSer.getOrCreateCartItem(cart, item.id, item.Price);
 					if (cartItem[1] == true) {
 						res.status(200).json(itemToCart);
 					}
@@ -51,7 +51,7 @@ router
 		let id = req.params.id;
 		const token = req.headers.authorization.split(' ')[1];
 		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-		let cart = await cartService.getCart(decodedToken.UserId);
+		let cart = decodedToken.Cart;
 		if (!quant) {
 			res.status(400).json({
 				message: 'A new quantity for the item must be provided.',
@@ -59,13 +59,13 @@ router
 		} else {
 			try {
 				if (id) {
-					let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
-					let itemStock = await itemService.itemById(id);
+					let itemIsInCart = await cartSer.getCartItemByItem(cart, id);
+					let itemStock = await itemSer.itemById(id);
 					if (!itemIsInCart) {
 						res.status(400).json(noSuchItemInCart);
 					} else {
 						if (itemStock.Quantity >= quant) {
-							cartService.updateQuantity(id, cart.id, quant);
+							cartSer.updateQuantity(id, cart, quant);
 							res.status(200).json({
 								message: `Quantity for item with id ${id} was successfully updated to ${quant}.`,
 							});
@@ -88,14 +88,14 @@ router
 		let id = req.params.id;
 		const token = req.headers.authorization.split(' ')[1];
 		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-		let cart = await cartService.getCart(decodedToken.UserId);
+		let cart = decodedToken.Cart;
 		try {
 			if (id) {
-				let itemIsInCart = await cartService.getCartItemByItem(cart.id, id);
+				let itemIsInCart = await cartSer.getCartItemByItem(cart, id);
 				if (!itemIsInCart) {
 					res.status(400).json(noSuchItemInCart);
 				} else {
-					cartService.deleteCartItem(id, cart.id);
+					cartSer.deleteCartItem(id, cart);
 					res.status(200).json({
 						message: `Item with id ${id} was successfully deleted from your cart.`,
 					});

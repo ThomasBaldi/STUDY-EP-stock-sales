@@ -7,11 +7,19 @@ class UserService {
 		this.Role = db.Role;
 	}
 
-	async createRole(role) {
-		return this.Role.create({
-			Role: role,
+	//roles--------
+
+	async bulkRole() {
+		return this.Role.bulkCreate([{ Role: 'Admin' }, { Role: 'User' }]);
+	}
+
+	async getRoles() {
+		return this.Role.findAll({
+			where: {},
 		});
 	}
+
+	//user----------
 
 	async create(username, password, email, salt) {
 		return this.User.create({
@@ -29,12 +37,6 @@ class UserService {
 			Email: email,
 			Salt: salt,
 			Role: 1,
-		});
-	}
-
-	async getRoles() {
-		return this.Role.findAll({
-			where: {},
 		});
 	}
 

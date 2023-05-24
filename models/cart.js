@@ -7,11 +7,6 @@ module.exports = (sequelize, Sequelize) => {
 				allowNull: false,
 				unique: true,
 			},
-			Status: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: false,
-				defaultValue: 'in-progress',
-			},
 		},
 		{ timestamps: false }
 	);

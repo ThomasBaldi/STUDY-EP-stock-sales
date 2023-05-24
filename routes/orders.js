@@ -2,110 +2,23 @@ var express = require('express');
 var router = express.Router();
 var db = require('../models');
 var jwt = require('jsonwebtoken');
-var UserService = require('../services/UserService');
-var ItemService = require('../services/Item&CategoryServ');
 var CartService = require('../services/Cart&CartItemServ');
 var OrderService = require('../services/Order&OrderItemServ');
-var userService = new UserService(db);
-var cartService = new CartService(db);
-var itemService = new ItemService(db);
-var orderService = new OrderService(db);
+var cartSer = new CartService(db);
+var orderSer = new OrderService(db);
 
 var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
 
 router
-	.post('/cart/checkout', checkIfUser, async (req, res, next) => {
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-		//set discount rates
-		let equalEmails = await userService.getAllEmails(decodedToken.Email);
-		if (equalEmails.length == 2) {
-			var discount = 0.1;
-		}
-		if (equalEmails.length == 3) {
-			var discount = 0.3;
-		}
-		if (equalEmails.length == 4) {
-			var discount = 0.4;
-		}
-		try {
-			let UserId = decodedToken.UserId;
-			let cart = await cartService.getCart(UserId);
-			let itemsExistInCart = await cartService.getUserCartItem(cart.id);
-
-			if (itemsExistInCart.length == 0) {
-				res.status(400).json({
-					message: 'Cannot checkout, there is no item in your cart yet.',
-				});
-			} else {
-				await cartService.checkOutCart(cart.id);
-				var Total = [];
-				itemsExistInCart.forEach(async (e) => {
-					Total.push(e.Price);
-				});
-				//check stock availability
-				var lowStock = [];
-				await Promise.all(
-					itemsExistInCart.map(async (e) => {
-						let item = await itemService.getLowQuantItem(e.ItemId, e.Quantity);
-						if (item != null) {
-							lowStock.push(item);
-						}
-					})
-				);
-				if (lowStock.length != 0) {
-					let items = [];
-					lowStock.forEach((e) => {
-						items.push({ Name: e.Name, ID: e.id, AvailableQuantity: e.Quantity });
-					});
-
-					res.status(400).json({
-						Message:
-							'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed your checkout.',
-						Items: items,
-					});
-				} else {
-					//get cart total and give discount if available
-					Total = Total.reduce((acc, curr) => acc + curr);
-					if (discount) {
-						var Discount = discount * 100 + '%';
-						var FinalTotal = Total - Total * discount;
-					} else {
-						var FinalTotal = Total;
-					}
-					/* await orderService.createOrder(decodedToken.UserId, FinalTotal); */
-
-					let order = await orderService.getLastUserOrder(decodedToken.UserId);
-					/* console.log(itemsExistInCart); */
-
-					//create orderId and send it via POST /order/:id
-					//together with the cartItems
-					//that endpoint will create all orderItems
-					res.status(200).json({
-						message: 'Cart has been checked-out and order is placed!',
-						OrderId: order.id,
-						TotalPrice: Total,
-						Discount: Discount,
-						FinalPrice: FinalTotal,
-					});
-				}
-			}
-		} catch (err) {
-			console.log(err);
-			res.status(400).json({
-				message: 'Something went wrong during checkout.',
-			});
-		}
-	})
 	.get('/orders', checkIfUser, async (req, res, next) => {
 		try {
 			const token = req.headers.authorization.split(' ')[1];
 			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
 			let UserId = decodedToken.UserId;
-			let cart = await cartService.getCart(UserId);
+			let cart = await cartSer.getCart(UserId);
 			cart.ItemsInCart = [];
 			cart.Total = [];
-			let cartItems = await cartService.getUserCartItem(cart.id);
+			let cartItems = await cartSer.getUserCartItem(cart.id);
 			cartItems.forEach((e) => {
 				cart.ItemsInCart.push({
 					Name: e['Item.Name'],
@@ -123,7 +36,6 @@ router
 			res.status(200).json({
 				Cart: {
 					id: cart.id,
-					Status: cart.Status,
 					Total: cart.Total,
 					ItemsInCart: cart.ItemsInCart,
 				},
@@ -137,7 +49,7 @@ router
 	})
 	.get('/allorders', checkIfAdmin, async (req, res, next) => {
 		try {
-			let carts = await cartService.getAllCartsQuery();
+			let carts = await cartSer.getAllQuery();
 			let usersCarts = carts.slice(1);
 
 			groupedByUser = Object.values(
@@ -153,7 +65,6 @@ router
 				e.Cart = {
 					Username: e[0].Username,
 					CartId: e[0].CartId,
-					Status: e[0].Status,
 					Items: [],
 				};
 				e.forEach((x) => {

@@ -3,40 +3,37 @@ var router = express.Router();
 var db = require('../models');
 var jwt = require('jsonwebtoken');
 var CartService = require('../services/Cart&CartItemServ');
-var cartService = new CartService(db);
+var cartSer = new CartService(db);
 
 var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
 
 router
-	.get('/cart', checkIfUser, async (req, res, next) => {
+	.get('/cart', checkIfUser, async (req, res) => {
 		try {
 			const token = req.headers.authorization.split(' ')[1];
 			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-			let UserId = decodedToken.UserId;
-			let cart = await cartService.getCart(UserId);
-			cart.ItemsInCart = [];
-			cart.Total = [];
-			let cartItems = await cartService.getUserCartItem(cart.id);
+			var ItemsInCart = [];
+			var Total = [];
+			let cartItems = await cartSer.getUserCartItem(decodedToken.Cart);
 			cartItems.forEach((e) => {
-				cart.ItemsInCart.push({
+				ItemsInCart.push({
 					Name: e['Item.Name'],
 					Id: e.ItemId,
 					Price: e.Price,
 					Quantity: e.Quantity,
 				});
-				cart.Total.push(e.Price);
+				Total.push(e.Price);
 			});
-			if (cart.Total.length != 0) {
-				cart.Total = cart.Total.reduce((acc, curr) => acc + curr);
+			if (Total.length != 0) {
+				Total = Total.reduce((acc, curr) => acc + curr);
 			} else {
-				cart.Total = 0;
+				Total = 0;
 			}
 			res.status(200).json({
 				Cart: {
-					id: cart.id,
-					Status: cart.Status,
-					Total: cart.Total,
-					ItemsInCart: cart.ItemsInCart,
+					id: decodedToken.Cart,
+					Total: Total,
+					ItemsInCart: ItemsInCart,
 				},
 			});
 		} catch (err) {
@@ -46,25 +43,22 @@ router
 			});
 		}
 	})
-	.get('/allcarts', checkIfAdmin, async (req, res, next) => {
+	.get('/allcarts', checkIfAdmin, async (req, res) => {
 		try {
-			let carts = await cartService.getAllCartsQuery();
+			let carts = await cartSer.getAllQuery();
 			let usersCarts = carts.slice(1);
-
-			groupedByUser = Object.values(
+			let groupedByUser = Object.values(
 				usersCarts[0].reduce((a, c) => {
 					a[c.Username] = a[c.Username] || [];
 					a[c.Username].push(c);
 					return a;
 				}, {})
 			);
-
 			var finalArray = [];
 			groupedByUser.forEach((e) => {
 				e.Cart = {
 					Username: e[0].Username,
 					CartId: e[0].CartId,
-					Status: e[0].Status,
 					Items: [],
 				};
 				e.forEach((x) => {
@@ -88,19 +82,18 @@ router
 			});
 		}
 	})
-	.delete('/:id', checkIfUser, async (req, res, next) => {
+	.delete('/cart/:id', checkIfUser, async (req, res) => {
 		let id = req.params.id;
 		const token = req.headers.authorization.split(' ')[1];
 		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
 		try {
-			let cart = await cartService.getCartById(id);
 			if (id) {
-				if (id == cart.id && decodedToken.UserId == cart.UserId) {
-					cartService.deleteAllCartItems(id);
+				if (id == decodedToken.Cart) {
+					await cartSer.deleteAllCartItems(id);
 					res.status(200).json({
-						message: `All items in cart with id: ${id} were successfully destroyed.`,
+						message: `All items in cart with id: ${id} were successfully deleted.`,
 					});
-				} else if (id == cart.id && decodedToken.UserId != cart.UserId) {
+				} else {
 					res.status(400).json({
 						message: `Cart with id ${id} isn't yours.`,
 					});
@@ -109,7 +102,7 @@ router
 		} catch (err) {
 			console.log(err);
 			res.status(400).json({
-				message: `There is no cart with id ${id}.`,
+				message: `Something went wrong with the cart deletion.`,
 			});
 		}
 	});

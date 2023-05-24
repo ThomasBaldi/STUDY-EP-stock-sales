@@ -24,8 +24,8 @@ class OrderService {
 
 	//order items methods -----------
 
-	async createOrderItems() {
-		return this.OrderItem.bulkCreate({});
+	async createOrderItems(items) {
+		return this.OrderItem.bulkCreate(items);
 	}
 }
 

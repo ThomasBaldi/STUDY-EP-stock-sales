@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var db = require('../models');
 var ItemService = require('../services/Item&CategoryServ');
-var itemService = new ItemService(db);
+var itemSer = new ItemService(db);
 var { checkIfAdmin } = require('../models/middleware/authMiddleware');
 
 let nameMsg = { message: 'Category with such name already exists.' };
@@ -12,7 +12,7 @@ let categoryNameMsg = { message: 'A new category name must be provided.' };
 router
 	.get('/categories', async (req, res, next) => {
 		try {
-			let allCategories = await itemService.getAllCat();
+			let allCategories = await itemSer.getAllCat();
 			res.status(200).json({
 				message: 'All available categories!',
 				Categories: allCategories,
@@ -27,7 +27,7 @@ router
 		if (!Name) {
 			res.status(400).json(categoryNameMsg);
 		} else {
-			let newCat = await itemService.findOrCreateCat(Name);
+			let newCat = await itemSer.findOrCreateCat(Name);
 			if (newCat[1] == true) {
 				res.status(200).json({
 					message: `${Name} was successfully added to the categories list.`,
@@ -40,8 +40,8 @@ router
 	.put('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let Name = req.body.Name;
 		let id = req.params.id;
-		let nameExists = await itemService.catByName(Name);
-		let idExists = await itemService.catById(id);
+		let nameExists = await itemSer.catByName(Name);
+		let idExists = await itemSer.catById(id);
 		if (idExists) {
 			if (!Name) {
 				res.status(400).json(categoryNameMsg);
@@ -49,7 +49,7 @@ router
 				if (nameExists) {
 					res.status(400).json(nameMsg);
 				} else {
-					itemService.updateCat(id, Name);
+					itemSer.updateCat(id, Name);
 					res.status(200).json({
 						message: `Category with id: ${id} was successfully updated to ${Name}.`,
 					});
@@ -61,11 +61,11 @@ router
 	})
 	.delete('/category/:id', checkIfAdmin, async (req, res, next) => {
 		let id = req.params.id;
-		let idExists = await itemService.catById(id);
-		let categoryInUse = await itemService.getAllByCat(id);
+		let idExists = await itemSer.catById(id);
+		let categoryInUse = await itemSer.getAllByCat(id);
 		if (idExists) {
 			if (categoryInUse.length == 0) {
-				itemService.deleteCat(id);
+				itemSer.deleteCat(id);
 				res.status(200).json({
 					message: `Category with id ${id} was successfully deleted.`,
 				});
