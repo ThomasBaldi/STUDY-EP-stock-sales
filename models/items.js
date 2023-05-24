@@ -1,66 +1,54 @@
 module.exports = (sequelize, Sequelize) => {
-	const Item = sequelize.define(
-		'Item',
-		{
-			id: {
-				type: Sequelize.DataTypes.INTEGER,
-				primaryKey: true,
-				autoIncrement: true,
-				allowNull: false,
-				unique: true,
-			},
-			Name: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: false,
-				unique: true,
-			},
-			Price: {
-				type: Sequelize.DataTypes.INTEGER,
-				allowNull: false,
-			},
-			Status: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: false,
-				defaultValue: 'in-stock',
-			},
-			SKU: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: false,
-				unique: true,
-			},
-			Quantity: {
-				type: Sequelize.DataTypes.INTEGER,
-				allowNull: false,
-			},
-			Image: {
-				type: Sequelize.DataTypes.STRING,
-				allowNull: true,
-			},
-			CategoryId: {
-				type: Sequelize.DataTypes.INTEGER,
-				allowNull: false,
-			},
-			createdAt: {
-				allowNull: false,
-				type: Sequelize.DATE,
-				defaultValue: Sequelize.fn('NOW'),
-			},
-			updatedAt: {
-				allowNull: false,
-				type: Sequelize.DATE,
-				defaultValue: Sequelize.fn('NOW'),
-			},
+	const Item = sequelize.define('Item', {
+		id: {
+			type: Sequelize.DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+			allowNull: false,
+			unique: true,
 		},
-		{
-			hooks: {
-				beforeSave: (i) => {
-					if (i.Quantity === 0) {
-						i.Status = 'out-of-stock';
-					}
-				},
-			},
-		}
-	);
+		Name: {
+			type: Sequelize.DataTypes.STRING,
+			allowNull: false,
+			unique: true,
+		},
+		Price: {
+			type: Sequelize.DataTypes.INTEGER,
+			allowNull: false,
+		},
+		Status: {
+			type: Sequelize.DataTypes.STRING,
+			allowNull: false,
+			defaultValue: 'in-stock',
+		},
+		SKU: {
+			type: Sequelize.DataTypes.STRING,
+			allowNull: false,
+			unique: true,
+		},
+		Quantity: {
+			type: Sequelize.DataTypes.INTEGER,
+			allowNull: false,
+		},
+		Image: {
+			type: Sequelize.DataTypes.STRING,
+			allowNull: true,
+		},
+		CategoryId: {
+			type: Sequelize.DataTypes.INTEGER,
+			allowNull: false,
+		},
+		createdAt: {
+			allowNull: false,
+			type: Sequelize.DATE,
+			defaultValue: Sequelize.fn('NOW'),
+		},
+		updatedAt: {
+			allowNull: false,
+			type: Sequelize.DATE,
+			defaultValue: Sequelize.fn('NOW'),
+		},
+	});
 
 	Item.associate = function (models) {
 		Item.belongsTo(models.Category);

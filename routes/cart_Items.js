@@ -28,12 +28,18 @@ router
 			try {
 				let item = await itemSer.getItem(body);
 				if (item) {
-					let cartItem = await cartSer.getOrCreateCartItem(cart, item.id, item.Price);
-					if (cartItem[1] == true) {
-						res.status(200).json(itemToCart);
-					}
-					if (cartItem[1] == false) {
-						res.status(400).json(itemAlready);
+					if (item.Quantity == 0) {
+						res.status(400).json({
+							message: 'Item is currently out of stock.',
+						});
+					} else {
+						let cartItem = await cartSer.getOrCreateCartItem(cart, item.id, item.Price);
+						if (cartItem[1] == true) {
+							res.status(200).json(itemToCart);
+						}
+						if (cartItem[1] == false) {
+							res.status(400).json(itemAlready);
+						}
 					}
 				} else {
 					res.status(400).json(noSuchItem);

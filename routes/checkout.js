@@ -83,8 +83,11 @@ router.post('/', checkIfUser, async (req, res, next) => {
 				//change item quantities
 				itemsCart.forEach(async (e) => {
 					let item = await itemSer.itemById(e.ItemId);
-					let newQuant = { Quantity: item.Quantity - e.Quantity };
-					await itemSer.updateItem(e.ItemId, newQuant);
+					let body = { Quantity: item.Quantity - e.Quantity };
+					if (body.Quantity == 0) {
+						body.Status = 'out-of-stock';
+					}
+					await itemSer.updateItem(e.ItemId, body);
 				});
 				res.status(200).json({
 					message: 'Cart has been checked-out and order is placed!',
