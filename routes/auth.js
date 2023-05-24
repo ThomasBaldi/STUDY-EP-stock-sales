@@ -66,6 +66,13 @@ router
 					res.status(400).json({ message: 'Invalid Password.' });
 				}
 				let token;
+				let expire;
+				if (userExists.id === 1) {
+					expire = '24H';
+				} else {
+					expire = '2H';
+				}
+				console.log(expire);
 				try {
 					token = jwt.sign(
 						{
@@ -74,7 +81,8 @@ router
 							Cart: cart.id,
 						},
 						process.env.TOKEN_SECRET,
-						{ expiresIn: '2h' }
+
+						{ expiresIn: expire }
 					);
 				} catch (err) {
 					console.log(err);
