@@ -31,12 +31,14 @@ class UserService {
 	}
 
 	async createAdmin(username, password, email, salt) {
-		return this.User.create({
-			Username: username,
-			Password: password,
-			Email: email,
-			Salt: salt,
-			Role: 1,
+		return this.User.findOrCreate({
+			where: {
+				Username: username,
+				Password: password,
+				Email: email,
+				Salt: salt,
+				Role: 1,
+			},
 		});
 	}
 

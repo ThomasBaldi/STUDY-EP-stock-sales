@@ -67,17 +67,17 @@ router
 				}
 				let token;
 				let expire;
-				if (userExists.id === 1) {
+				if (userExists.Role === 1) {
 					expire = '24H';
 				} else {
 					expire = '2H';
 				}
-				console.log(expire);
 				try {
 					token = jwt.sign(
 						{
 							UserId: userExists.id,
 							Email: userExists.Email,
+							Role: userExists.Role,
 							Cart: cart.id,
 						},
 						process.env.TOKEN_SECRET,

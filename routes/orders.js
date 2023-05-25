@@ -7,43 +7,65 @@ var OrderService = require('../services/Order&OrderItemServ');
 var cartSer = new CartService(db);
 var orderSer = new OrderService(db);
 
-var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
+var { checkIfAdmin, checkIfToken } = require('../models/middleware/authMiddleware');
 
 router
-	.get('/orders', checkIfUser, async (req, res, next) => {
+	.get('/orders', checkIfToken, async (req, res, next) => {
 		try {
 			const token = req.headers.authorization.split(' ')[1];
 			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+			let UserRole = decodedToken.Role;
 			let UserId = decodedToken.UserId;
-			let cart = await cartSer.getCart(UserId);
-			cart.ItemsInCart = [];
-			cart.Total = [];
-			let cartItems = await cartSer.getUserCartItem(cart.id);
-			cartItems.forEach((e) => {
-				cart.ItemsInCart.push({
-					Name: e['Item.Name'],
-					Id: e.ItemId,
-					Price: e.Price,
-					Quantity: e.Quantity,
+			if (!token) {
+				res.status(400).json({
+					message: 'Only registered users or Admin has access to this endpoint.',
 				});
-				cart.Total.push(e.Price);
-			});
-			if (cart.Total.length != 0) {
-				cart.Total = cart.Total.reduce((acc, curr) => acc + curr);
 			} else {
-				cart.Total = 0;
+				if (UserRole === 1) {
+					//get all orders (completed/in-progress/cancelled) of all users
+					var order = await orderSer.getAllOrders();
+				} else {
+					//get only all completed orders for user
+					var order = await orderSer.getCompletedUSerOrders(UserId);
+				}
+				groupUsers = Object.values(
+					order.reduce((a, c) => {
+						a[c.UserId] = a[c.UserId] || [];
+						a[c.UserId].push(c);
+						return a;
+					}, {})
+				);
+				var allOrders = [];
+				groupUsers.forEach((e) => {
+					e.User = {
+						UserId: e[0].UserId,
+						Username: e[0]['User.Username'],
+						Orders: [],
+					};
+					e.forEach((x) => {
+						Order = {
+							OrderId: x.id,
+							Status: x.Status,
+							Total: x.TotalPrice,
+						};
+						e.User.Orders.push(Order);
+					});
+					allOrders.push(e.User);
+				});
+				if (order.length == 0) {
+					res.status(400).json({
+						Message: 'There are no completed orders to be seen yet.',
+					});
+				} else {
+					res.status(200).json({
+						Order: allOrders,
+					});
+				}
 			}
-			res.status(200).json({
-				Cart: {
-					id: cart.id,
-					Total: cart.Total,
-					ItemsInCart: cart.ItemsInCart,
-				},
-			});
 		} catch (err) {
 			console.log(err);
 			res.status(400).json({
-				message: 'Something went wrong with the Cart search.',
+				message: 'Something went wrong with the Order search.',
 			});
 		}
 	})
