@@ -71,42 +71,51 @@ router
 	})
 	.get('/allorders', checkIfAdmin, async (req, res, next) => {
 		try {
-			let carts = await cartSer.getAllQuery();
-			let usersCarts = carts.slice(1);
-
-			groupedByUser = Object.values(
-				usersCarts[0].reduce((a, c) => {
-					a[c.Username] = a[c.Username] || [];
-					a[c.Username].push(c);
+			//get all orders and all items in orders
+			let order = await orderSer.getAllOrdersQuery();
+			let userOrders = order.slice(1);
+			var allOrders = [];
+			let byOrder = Object.values(
+				userOrders[0].reduce((a, c) => {
+					if (!a[c.OrderId]) {
+						a[c.OrderId] = [];
+					}
+					a[c.OrderId].push(c);
 					return a;
 				}, {})
 			);
-
-			var finalArray = [];
-			groupedByUser.forEach((e) => {
-				e.Cart = {
-					Username: e[0].Username,
-					CartId: e[0].CartId,
+			byOrder.forEach((o) => {
+				o.Order = {
+					Order: o[0].OrderId,
+					Username: o[0].Username,
+					Status: o[0].Status,
+					Total: o[0].TotalPrice,
 					Items: [],
 				};
-				e.forEach((x) => {
+				o.forEach((i) => {
 					Item = {
-						ItemName: x.Name,
-						ItemId: x.ItemId,
-						Price: x.Price,
-						Quantity: x.Quantity,
+						Name: i.Name,
+						id: i.ItemId,
+						Price: i.Price,
+						Quantity: i.Quantity,
 					};
-					e.Cart.Items.push(Item);
-				}),
-					finalArray.push(e.Cart);
+					o.Order.Items.push(Item);
+				});
+				allOrders.push(o.Order);
 			});
-			res.status(200).json({
-				AllCarts: finalArray,
-			});
+			if (order.length == 0) {
+				res.status(400).json({
+					Message: 'There are no orders to be seen yet.',
+				});
+			} else {
+				res.status(200).json({
+					AllOrders: allOrders,
+				});
+			}
 		} catch (err) {
 			console.log(err);
 			res.status(400).json({
-				message: 'Something went wrong with the Cart search.',
+				message: 'Something went wrong with the Order search.',
 			});
 		}
 	});

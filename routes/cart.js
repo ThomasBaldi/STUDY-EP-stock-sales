@@ -22,7 +22,7 @@ router
 					Price: e.Price,
 					Quantity: e.Quantity,
 				});
-				Total.push(e.Price);
+				Total.push(e.Price * e.Quantity);
 			});
 			if (Total.length != 0) {
 				Total = Total.reduce((acc, curr) => acc + curr);

@@ -38,7 +38,7 @@ router.post('/', checkIfUser, async (req, res, next) => {
 		} else {
 			var Total = [];
 			itemsCart.forEach(async (e) => {
-				Total.push(e.Price);
+				Total.push(e.Price * e.Quantity);
 			});
 			//check stock availability
 			var lowStock = [];
