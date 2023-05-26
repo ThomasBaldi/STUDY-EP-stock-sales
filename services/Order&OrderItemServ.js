@@ -41,7 +41,7 @@ class OrderService {
 			raw: true,
 			where: {
 				UserId: id,
-				Status: 'Completed',
+				Status: 'complete',
 			},
 			include: {
 				model: this.User,
@@ -81,6 +81,10 @@ class OrderService {
 				'SELECT `Order`.`id`, `Order`.`UserId`, `Order`.`Status`, `Order`.`TotalPrice`, `User`.`id` , `User`.`Username` AS `Username`, `OrderItems`.`OrderId` AS `OrderId`, `OrderItems`.`Name` AS `Name`, `OrderItems`.`ItemId` AS `ItemId`, `OrderItems`.`Price` AS `Price`, `OrderItems`.`Quantity` AS `Quantity` FROM `Orders` AS `Order` LEFT OUTER JOIN `Users` AS `User` ON `Order`.`UserId` = `User`.`id` INNER JOIN `OrderItems` AS `OrderItems` ON `Order`.`id` = `OrderItems`.`OrderId`'
 			)
 		);
+	}
+
+	async statusUpdate(id, status) {
+		return this.Order.update({ Status: status }, { where: { id: id } });
 	}
 
 	//order items methods -----------
