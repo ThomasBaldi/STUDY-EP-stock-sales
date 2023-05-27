@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, sequelize } = require('sequelize');
 
 class ItemService {
 	constructor(db) {
@@ -158,6 +158,63 @@ class ItemService {
 		return this.Category.destroy({
 			where: {
 				id: id,
+			},
+		});
+	}
+
+	// utility --------
+
+	async searchItems(name) {
+		return this.Item.findAll({
+			raw: true,
+			where: { Name: { [Op.like]: `%${name}%` } },
+			attributes: {
+				exclude: ['createdAt', 'updatedAt', 'CategoryId'],
+			},
+			include: {
+				model: this.Category,
+				attributes: [['Name', '']],
+			},
+		});
+	}
+
+	async searchCat(name) {
+		return this.Category.findAll({
+			raw: true,
+			where: { Name: name },
+			attributes: {
+				exclude: ['createdAt', 'updatedAt'],
+			},
+		});
+	}
+
+	async searchSKU(sku) {
+		return this.Item.findAll({
+			raw: true,
+			where: { SKU: { [Op.like]: `%${sku}%` } },
+			attributes: {
+				exclude: ['createdAt', 'updatedAt', 'CategoryId'],
+			},
+			include: {
+				model: this.Category,
+				attributes: ['Name'],
+			},
+		});
+	}
+
+	async searchItemCat(name, category) {
+		return this.Item.findAll({
+			raw: true,
+			where: {
+				Name: { [Op.like]: `%${name}%` },
+				CategoryId: category,
+			},
+			attributes: {
+				exclude: ['createdAt', 'updatedAt', 'CategoryId'],
+			},
+			include: {
+				model: this.Category,
+				attributes: ['Name'],
 			},
 		});
 	}

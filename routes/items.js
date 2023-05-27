@@ -21,7 +21,7 @@ router
 			let allItems = await itemSer.getAll();
 			var availableItems = [];
 			allItems.forEach((e) => {
-				if (e.Quantity > 0) {
+				if (e.Status === 'in-stock') {
 					availableItems.push(e);
 				}
 			});
@@ -40,7 +40,7 @@ router
 			}
 		} catch (err) {
 			console.log(err);
-			res.status(400).json('Something went wrong with the request.');
+			res.status(400).json('Something went wrong while retrieving the items.');
 		}
 	})
 	.post('/item', checkIfAdmin, async (req, res, next) => {

@@ -8,6 +8,9 @@ var ItemService = require('../services/Item&CategoryServ');
 var userSer = new UserService(db);
 var itemSer = new ItemService(db);
 
+let atLeast = { message: 'At least one character must be provided on search parameters.' };
+let noRes = { ItemsResult: 'No results available.' };
+
 router
 	.post('/setup', async (req, res, next) => {
 		const existRoles = await userSer.getRoles();
@@ -88,6 +91,70 @@ router
 			res.status(300).json({ message: 'All setup data has already been added to DB' });
 		}
 	})
-	.post('/search', async (res, req, next) => {});
+	.post('/search', async (req, res, next) => {
+		let { Items, SKU, Categories } = req.body;
+		let string = /^.*[a-zA-Z0-9]+.*$/;
+		let skuRegex = /^[A-Z]{2}\d{3}$/;
+		if (!req.body) {
+			res.status(200).json({
+				Search: result,
+			});
+		} else {
+			try {
+				if (!string.test(Items)) {
+					res.status(400).json(atLeast);
+				} else if (!string.test(Categories)) {
+					res.status(400).json(atLeast);
+				} else if (!string.test(Items)) {
+					res.status(400).json(atLeast);
+				} else {
+					if (Items && !Categories) {
+						//case insensitive partial item name
+						let result = await itemSer.searchItems(Items);
+						if (result.length <= 0) {
+							res.status(400).json(noRes);
+						}
+						res.status(200).json({ ItemsResult: result });
+					}
+					if (Categories && !Items) {
+						//specific category name
+						let result = await itemSer.searchCat(Categories);
+						if (result.length <= 0) {
+							res.status(400).json(noRes);
+						}
+						res.status(200).json({ CategoryResult: result });
+					}
+					if (SKU) {
+						if (!SKU.match(skuRegex)) {
+							res.status(200).json({
+								message: 'SKU has to be 2 upperCase letters and 3 numbers.',
+							});
+						} else {
+							//specific SKU
+							let result = await itemSer.searchSKU(SKU);
+							res.status(200).json({ ItemsSKUresult: result });
+						}
+					}
+					if (Items && Categories) {
+						//Search for a partial item_name for a specific category name
+						let cat = await itemSer.catByName(Categories);
+						if (!cat) {
+							res.status(200).json({ message: 'No category matches your search parameter' });
+						} else {
+							let result = await itemSer.searchItemCat(Items, cat.id);
+							res.status(200).json({ ItemsWithCategory: result });
+						}
+					}
+				}
+			} catch (err) {
+				console.log(err);
+				res.status(400).json({ message: 'Something went wrong with the search request.' });
+			}
+		}
+		//Depending on the search criteria, items or categories should be searched
+		/* 
+			
+			 */
+	});
 
 module.exports = router;
