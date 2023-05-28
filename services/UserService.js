@@ -68,10 +68,10 @@ class UserService {
 		});
 	}
 
-	async deleteUser(userId) {
+	async deleteUser(name) {
 		return this.User.destroy({
 			where: {
-				id: userId,
+				Username: name,
 				Role: {
 					//Admin cannot be deleted
 					[Op.not]: 1,

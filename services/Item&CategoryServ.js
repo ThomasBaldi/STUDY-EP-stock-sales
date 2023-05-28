@@ -173,7 +173,7 @@ class ItemService {
 			},
 			include: {
 				model: this.Category,
-				attributes: [['Name', '']],
+				attributes: ['Name'],
 			},
 		});
 	}

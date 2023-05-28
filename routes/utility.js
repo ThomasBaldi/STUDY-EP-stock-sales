@@ -19,30 +19,6 @@ router
 		const existsItems = await itemSer.getAll();
 		var items = [];
 		var categories = [];
-		//get the data and push it to the arrays
-		await axios.get('http://143.42.108.232:8888/items/stock').then((res) => {
-			//items array
-			let data = res.data.data;
-			data.forEach((e) => items.push(e));
-			//category array
-			data.forEach((e) => {
-				if (!categories.includes(e.category)) {
-					categories.push(e.category);
-				}
-			});
-		});
-		//create objects array of the strings array
-		let newCategories = categories.map((name, id = 1) => {
-			return { Name: name, id: id + 1 };
-		});
-		//switch categoryName with categoryId
-		items.map((e) => {
-			var result = newCategories.filter((x) => x.Name == e.category);
-			if (result.length > 0) {
-				e.category = result[0].id;
-			}
-			return e;
-		});
 		//populate all tables if no data is stored!
 		if (
 			existRoles.length == 0 ||
@@ -51,9 +27,33 @@ router
 			existsItems.length == 0
 		) {
 			try {
-				//roles
+				//get the data and push it to the arrays
+				await axios.get('http://143.42.108.232:8888/items/stock').then((res) => {
+					//items array
+					let data = res.data.data;
+					data.forEach((e) => items.push(e));
+					//category array
+					data.forEach((e) => {
+						if (!categories.includes(e.category)) {
+							categories.push(e.category);
+						}
+					});
+				});
+				//create objects array of the strings array
+				let newCategories = categories.map((name, id = 1) => {
+					return { Name: name, id: id + 1 };
+				});
+				//switch categoryName with categoryId
+				items.map((e) => {
+					var result = newCategories.filter((x) => x.Name == e.category);
+					if (result.length > 0) {
+						e.category = result[0].id;
+					}
+					return e;
+				});
+				//populate roles
 				await userSer.bulkRole();
-				//Admin user
+				//insert Admin user
 				let salt = crypto.randomBytes(16);
 				crypto.pbkdf2('P@ssword2023', salt, 310000, 32, 'sha256', (err, hash) => {
 					if (err) throw new Error('Internal Server Error');
@@ -66,11 +66,11 @@ router
 						});
 					}
 				});
-				//categories
-				newCategories.forEach((e) => itemSer.createCat(e.id, e.Name));
-				//items
-				items.forEach((e) => {
-					itemSer.create(
+				//populate categories
+				newCategories.forEach(async (e) => await itemSer.createCat(e.id, e.Name));
+				//populate items
+				items.forEach(async (e) => {
+					await itemSer.create(
 						e.id,
 						e.item_name,
 						e.price,
@@ -80,13 +80,13 @@ router
 						e.category
 					);
 				});
+				res.status(200).json({
+					message: 'Roles, Admin user, Categories and Items from API are successfully added to DB.',
+				});
 			} catch (err) {
 				console.log(err);
 				res.status(400).json({ message: 'Something went wrong with the setup.' });
 			}
-			res.status(200).json({
-				message: 'Roles, Admin user, Categories and Items from API are successfully added to DB.',
-			});
 		} else {
 			res.status(300).json({ message: 'All setup data has already been added to DB' });
 		}
@@ -151,10 +151,6 @@ router
 				res.status(400).json({ message: 'Something went wrong with the search request.' });
 			}
 		}
-		//Depending on the search criteria, items or categories should be searched
-		/* 
-			
-			 */
 	});
 
 module.exports = router;
