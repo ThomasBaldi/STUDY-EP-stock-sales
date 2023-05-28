@@ -45,6 +45,8 @@ router
 					e.forEach((x) => {
 						Order = {
 							OrderId: x.id,
+							Created: x.createdAt,
+							Updated: x.updatedAt,
 							Status: x.Status,
 							Total: x.TotalPrice,
 						};
@@ -73,6 +75,7 @@ router
 		try {
 			//get all orders and all items in orders
 			let order = await orderSer.getAllOrdersQuery();
+			console.log(order);
 			let userOrders = order.slice(1);
 			var allOrders = [];
 			let byOrder = Object.values(
@@ -87,6 +90,8 @@ router
 			byOrder.forEach((o) => {
 				o.Order = {
 					Order: o[0].OrderId,
+					Created: o[0].createdAt,
+					Updated: o[0].updatedAt,
 					Username: o[0].Username,
 					Status: o[0].Status,
 					Total: o[0].TotalPrice,

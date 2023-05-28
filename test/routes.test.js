@@ -195,7 +195,7 @@ describe('testing-API-ednpoints', () => {
 	});
 	//9 Delete all the values added to the database in the previous tests
 	//(CAT_TEST, ITEM_TEST, and the user created).
-	test('DELETE /item/:id, DELETE /category/:id - success', async () => {
+	test('DELETE /item/:id, DELETE /category/:id DELETE user(no endpoint..) - success', async () => {
 		const res = await request(app)
 			.delete('/item/161')
 			.set('Authorization', 'Bearer ' + token);
