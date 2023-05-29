@@ -35,7 +35,7 @@ It is set up to respect 3N form and every table has all the required fields, plu
 
 ## Endpoints and system usage:
 
-You can either follow this Postaman documentation here () or the instructions I am adding to this Readme
+You can either follow the Postaman documentation here () or the instructions and details I am adding to this section of the readme.
 
 1. First of all, let's populate the database with the "POST/setup" endpoint.
 
@@ -97,6 +97,81 @@ Checks are made to validate that all attributes provided are either available(ca
   Error messages are in place should the id not match any existing item.
 
 4. Signup and Login:
+
+- Guests can signup through "POST/signup" with a request body like the following one:
+
+```JSON
+{
+    "Username": "TestUser",
+    "Password": "test123",
+    "Email": "test@test.com",
+}
+```
+
+The user role is set to be by default equal to 2 (User) in the user model and the previous mentioned hook preventing more than 1 Admin users beeing added ensures that this endpoint only creates Users with a User role.
+Validation checks are made on Username having to be unique and on emails, as there is a maximum of 4 duplicate emails allowed. A hook is set up on the user model to enforce such email duplicate restriction and prevent a fifth equal email to be added on signup.
+As per previous endpoints, all errors are handled and return relevant response messages.
+While the signup is being done, the password is hashed and salted using crypto and then stored in the database as datatype BLOB for security reasons.
+
+- Admin and existing users can login through "POST/login" with a request body like the following one:
+
+```JSON
+{
+    "Username": "TestUser",
+    "Password": "test123",
+}
+```
+
+The endpoint validates the request body by checking if the Username is stored in the databse and by checking through crypto if the hashed salted password matches.
+A cart check is also done, to see if the user has already the one and only cart he/she can have, if it is the first login, a cart will be created.
+Also a token is created during login and this has an expiration time of 2h (I set it to 24h if it is the admin that logs in as I can imagine a workday is longer than 2 hours for him/her).
+The token is provided in the response body together with a login message.
+(PS: Requirements in the test area would insinuate that a token should be provided in the signup response and used during login, something I don't believe to be a well working practice especially as it expires after 2 hours and should work as a session/role-authentication method, but shouldn't be used for skipping the login user/password authentication process)
+
+5. Cart:
+
+- Registered users can access the "GET/cart" endpoint.
+  Here they'll be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
+  The endpoint handles errors should there be any in retrieving such data.
+
+- Only the Admin can access the "GET/allcarts" endpoint.
+  The result body is the same as the get/cart for users, simply it shows all carts of all the users.
+  The endpoint handles errors should there be any in retrieving such data.
+
+- Registered users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
+  Should they pass a cart number that isn't theirs, an error message will be sent as a response. Otherwise, should there be any error during the deletion, a relevant message will be in the response.
+
+6. Cart-Items:
+
+- Registered users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
+
+```JSON
+{
+    "id": 130, //or "Name": "sofa",
+}
+```
+
+The endpoint can be used with either id or Name as attributes in the body request, it'll make sure that such item exists in the inventary and that the item isn't already in the cart.
+If it exists in the cart, the user will be notified about it in the response body.
+Any other type of error is also handled and will have a response with relevant message.
+The cart item references the item from the items table, but the price is inserted in the cart item to prevent price changes, should the items price be changed while the user has the item in his/her cart.
+
+- Registered users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
+
+```JSON
+{
+    "Quantity": 20,
+}
+```
+
+This endpoint checks if the quantity is available in the inventory and if it is, it'll update the quantity of the desired cart item, otherwise it'll notify the user with a response body of the too high quantity request and showing the max available current quantity of the ionventory.
+If any other error happens, it'll be handled and a relevant response will be sent.
+
+- Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
+  If it isn't matching any of the cart items in the cart a releveant reponse is sent.
+  Any other error will send a relevant response message.
+
+7. Orders:
 
 ## Testing with Supertest and Jest
 
