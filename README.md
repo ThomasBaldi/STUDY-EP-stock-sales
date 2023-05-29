@@ -20,6 +20,8 @@ This will create the user that will interact and have all access to the database
 5. Run `CREATE DATABASE StockSalesDB;` to create the databse/schema.
 6. Go back to Vscode, create a .env file at the main branch of the directory (same level as app.js), and copy paste the following variables in it (make sure also to save):
 
+(The token secret could be anything, I decided to create a token from the terminal by running node and generating the above token secret with crypto. )
+
 ```
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="P@ssw0rd"
@@ -30,8 +32,9 @@ HOST="localhost"
 TOKEN_SECRET='7bbfda2dc66ae26fb8e3028cbddece55d19514292d048bce237005904b9874703654bf0cd155a4814f13615d9f40f5edb7ee2119c14fd208a3a360c74628eea9'
 ```
 
-The token secret could be anything, I decided to create a token from the terminal by running node and generating the above token secret with crypto. 7. Now you can run "npm start" in your terminal, this will create all the tables and their relationships in the StockSalesDB database you created earlier. 8. The databse part of the system is now set up and ready for use.
-It is set up to respect 3N form and every table has all the required fields, plus createdAt and updatedAt where it makes sense for an Admin User to keep track of such timestamps and will be shown also to the customer where needed.
+7. Now you can run "npm start" in your terminal, this will create all the tables and their relationships in the StockSalesDB database you created earlier.
+8. The databse part of the system is now set up and ready for use.
+   It is set up to respect 3N form and every table has all the required fields, plus createdAt and updatedAt where it makes sense for an Admin User to keep track of such timestamps and will be shown also to the customer where needed.
 
 ## Endpoints and system usage:
 
