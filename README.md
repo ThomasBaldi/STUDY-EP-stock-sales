@@ -17,7 +17,7 @@ GRANT ALL PRIVILEGES ON database_name.* TO 'admin'@'localhost';
 
 This will create the user that will interact and have all access to the database of the system.
 
-5. Run `CREATE DATABASE StockSalesDB;` to create the databse/schema.
+5. Run the querry `CREATE DATABASE StockSalesDB;` to create the databse/schema.
 6. Go back to Vscode, create a .env file at the main branch of the directory (same level as app.js), and copy paste the following variables in it (make sure also to save):
 
 (The token secret could be anything, I decided to create a token from the terminal by running node and generating the above token secret with crypto. )
@@ -303,7 +303,7 @@ I haven't implemented the same function to be run at the end of the tests as I t
 
 Should you run tests prior to manually test each endpoint with Postman, please remember to drop and create the database and reload the application.
 
-![image](https://github.com/ThomasBaldi/stock-sales/assets/114188470/6f34c8fb-015d-49a9-a359-2389bc581514)
+![image](https://github.com/ThomasBaldi/stock-sales/assets/114188470/8e347988-861d-42aa-87ca-3d1030519615)
 
 ## Libraries/Packages Link
 
