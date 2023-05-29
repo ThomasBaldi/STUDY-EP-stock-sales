@@ -40,7 +40,9 @@ TOKEN_SECRET='7bbfda2dc66ae26fb8e3028cbddece55d19514292d048bce237005904b98747036
 
 You can either follow the Postaman documentation here () or the instructions and details I am adding to this section of the readme.
 
-1. First of all, let's populate the database with the "POST/setup" endpoint.
+### Setup:
+
+First of all, let's populate the database with the "POST/setup" endpoint.
 
 - It doesn't need a body
 - It will create 2 roles, 1 = Admin and 2 = User,
@@ -51,33 +53,35 @@ You can either follow the Postaman documentation here () or the instructions and
 - These action will only trigger, if items are not already available in the database
 - Otherwise, the endpoint will notify that all relevant data is already available in the databse
 
-2. Categories:
+### Categories:
 
-- Everyone has access to "GET/categories" (an error response message will be sent should there be any errors)
-- Only the Admin can add new categories through "POST/category" with a request body:
+1. Everyone has access to "GET/categories" (an error response message will be sent should there be any errors)
+
+2. Only the Admin can add new categories through "POST/category" with a request body:
 
 ```JSON
 { "Name": "TestCategory" }
 ```
 
-Error messages are given if there is a missing body to the request or if the category already exists.
+- Error messages are given if there is a missing body to the request or if the category already exists.
 
-- Only the Admin can update a category through "PUT/cateogry/:id" with a request body:
+3. Only the Admin can update a category through "PUT/cateogry/:id" with a request body:
 
 ```JSON
 { "Name": "UpdatedCategory" }
 ```
 
-Error messages are in place for, parameter id not matching any category id, body not having any Name spcified, name provided already in use in another category.
+- Error messages are in place for, parameter id not matching any category id, body not having any Name spcified, name provided already in use in another category.
 
-- Only the Admin can delete categories through "DELETE/category/:id" by giving the id of such category as a parameter.
-  Error messages are in place should the id not match any existing category or be currently in use with any items.
+4. Only the Admin can delete categories through "DELETE/category/:id" by giving the id of such category as a parameter.
+   Error messages are in place should the id not match any existing category or be currently in use with any items.
 
-3. Items:
+### Items:
 
-- Everyone has acces to "GET/items" but, as per requirements, guest users will only be able to see in-stock items.
-  An error message will be displayed in the response body should there be any issue retrieving all items.
-- Only the Admin can add items through "POST/item" with a request body like the following:
+1. Everyone has acces to "GET/items" but, as per requirements, guest users will only be able to see in-stock items.
+   An error message will be displayed in the response body should there be any issue retrieving all items.
+
+2. Only the Admin can add items through "POST/item" with a request body like the following:
 
 ```JSON
 {
@@ -90,18 +94,21 @@ Error messages are in place for, parameter id not matching any category id, body
 }
 ```
 
-The only optional attribute is the Image one. All other attributes are mandatory.
-Checks are made to validate that all attributes provided are either available(category id), meeting format requirements(SKU) or are not already in use on other items (as per the unique constraints of Name and SKU). Should any error happen, a relevant message will be sent in the response body.
+- The only optional attribute is the Image one. All other attributes are mandatory.
+- Checks are made to validate that all attributes provided are either available(category id), meeting format requirements(SKU) or are not already in use on other items (as per the unique constraints of Name and SKU).
+- Should any error happen, a relevant message will be sent in the response body.
 
-- Only the Admin can update an item through "PUT/item/:id" with a request body and by passing an existing item id as a parameter.
-  The update is possible with any combination of attribute, could for example be simply a Name change or a PRICE, SKU and Image change, the attributes you add to the request body will be the ones being updated.
-  As for the post endpoint, checks are made for validation and error handling with relevant response messages.
-- Only the Admin can delete items through "DELETE/item/:id" by giving the id of such item as a parameter.
-  Error messages are in place should the id not match any existing item.
+3. Only the Admin can update an item through "PUT/item/:id" with a request body and by passing an existing item id as a parameter.
 
-4. Signup and Login:
+- The update is possible with any combination of attribute, could for example be simply a Name change or a PRICE, SKU and Image change, the attributes you add to the request body will be the ones being updated.
+- Checks are made for validation and error handling with relevant response messages.
 
-- Guests can signup through "POST/signup" with a request body like the following one:
+4. Only the Admin can delete items through "DELETE/item/:id" by giving the id of such item as a parameter.
+   Error messages are in place should the id not match any existing item.
+
+### Signup and Login:
+
+1. Guests can signup through "POST/signup" with a request body like the following one:
 
 ```JSON
 {
@@ -111,12 +118,13 @@ Checks are made to validate that all attributes provided are either available(ca
 }
 ```
 
-The user role is set to be by default equal to 2 (User) in the user model and the previous mentioned hook preventing more than 1 Admin users beeing added ensures that this endpoint only creates Users with a User role.
-Validation checks are made on Username having to be unique and on emails, as there is a maximum of 4 duplicate emails allowed. A hook is set up on the user model to enforce such email duplicate restriction and prevent a fifth equal email to be added on signup.
-As per previous endpoints, all errors are handled and return relevant response messages.
-While the signup is being done, the password is hashed and salted using crypto and then stored in the database as datatype BLOB for security reasons.
+- The user role is set to be by default equal to 2 (User) in the user model and the previous mentioned hook preventing more than 1 Admin users beeing added ensures that this endpoint only creates Users with a User role.
+- Validation checks are made on Username having to be unique and on emails, as there is a maximum of 4 duplicate emails allowed.
+- A hook is set up on the user model to enforce such email duplicate restriction and prevent a fifth equal email to be added on signup.
+- As per previous endpoints, all errors are handled and return relevant response messages.
+- During the signup call, the password is hashed and salted using crypto and then stored in the database as datatype BLOB for security reasons.
 
-- Admin and existing users can login through "POST/login" with a request body like the following one:
+2. Admin and existing users can login through "POST/login" with a request body like the following one:
 
 ```JSON
 {
@@ -125,28 +133,32 @@ While the signup is being done, the password is hashed and salted using crypto a
 }
 ```
 
-The endpoint validates the request body by checking if the Username is stored in the databse and by checking through crypto if the hashed salted password matches.
-A cart check is also done, to see if the user has already the one and only cart he/she can have, if it is the first login, a cart will be created.
-Also a token is created during login and this has an expiration time of 2h (I set it to 24h if it is the admin that logs in as I can imagine a workday is longer than 2 hours for him/her).
-The token is provided in the response body together with a login message.
-(PS: Requirements in the test area would insinuate that a token should be provided in the signup response and used during login, something I don't believe to be a well working practice especially as it expires after 2 hours and should work as a session/role-authentication method, but shouldn't be used for skipping the login user/password authentication process)
+- The endpoint validates the request body by checking if the Username is stored in the databse and by checking through crypto if the hashed salted password matches.
+- A cart check is also done, to see if the user has already the one and only cart he/she can have, if it is the first login, a cart will be created.
+- Also a token is created during login and this has an expiration time of 2h (I set it to 24h if it is the admin that logs in as I can imagine a workday is longer than 2 hours for him/her).
+- The token is provided in the response body together with a login message.
+- (PS: Requirements in the test area would insinuate that a token should be provided in the signup response and used during login, something I don't believe to be a well working practice especially as it expires after 2 hours and should work as a session/role-authentication method, but shouldn't be used for skipping the login user/password authentication process)
 
-5. Cart:
+### Cart:
 
-- Registered users can access the "GET/cart" endpoint.
-  Here they'll be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
-  The endpoint handles errors should there be any in retrieving such data.
+1. Registered users can access the "GET/cart" endpoint.
 
-- Only the Admin can access the "GET/allcarts" endpoint.
-  The result body is the same as the get/cart for users, simply it shows all carts of all the users.
-  The endpoint handles errors should there be any in retrieving such data.
+- With this endpoint users will be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
+- The endpoint handles errors should there be any in retrieving such data.
 
-- Registered users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
-  Should they pass a cart number that isn't theirs, an error message will be sent as a response. Otherwise, should there be any error during the deletion, a relevant message will be in the response.
+2. Only the Admin can access the "GET/allcarts" endpoint.
 
-6. Cart-Items:
+- The result body is the same as the get/cart for users, simply it shows all carts of all the users.
+- The endpoint handles errors should there be any in retrieving such data.
 
-- Registered users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
+3. Registered users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
+
+- Should they pass a cart number that isn't theirs, an error message will be sent as a response.
+- Otherwise, should there be any error during the deletion, a relevant message will be in the response.
+
+### Cart-Items:
+
+1. Registered users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
 
 ```JSON
 {
@@ -154,12 +166,12 @@ The token is provided in the response body together with a login message.
 }
 ```
 
-The endpoint can be used with either id or Name as attributes in the body request, it'll make sure that such item exists in the inventary and that the item isn't already in the cart.
-If it exists in the cart, the user will be notified about it in the response body.
-Any other type of error is also handled and will have a response with relevant message.
-The cart item references the item from the items table, but the price is inserted in the cart item to prevent price changes, should the items price be changed while the user has the item in his/her cart.
+- The endpoint can be used with either id or Name as attributes in the body request, it'll make sure that such item exists in the inventary and that the item isn't already in the cart.
+- If it exists in the cart, the user will be notified about it in the response body.
+- Any other type of error is also handled and will have a response with relevant message.
+- The cart item references the item from the items table, but the price is inserted in the cart item to prevent price changes, should the items price be changed while the user has the item in his/her cart.
 
-- Registered users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
+2. Registered users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
 
 ```JSON
 {
@@ -167,14 +179,15 @@ The cart item references the item from the items table, but the price is inserte
 }
 ```
 
-This endpoint checks if the quantity is available in the inventory and if it is, it'll update the quantity of the desired cart item, otherwise it'll notify the user with a response body of the too high quantity request and showing the max available current quantity of the ionventory.
-If any other error happens, it'll be handled and a relevant response will be sent.
+- This endpoint checks if the quantity is available in the inventory and if it is, it'll update the quantity of the desired cart item, otherwise it'll notify the user with a response body of the too high quantity request and showing the max available current quantity of the ionventory.
+- If any other error happens, it'll be handled and a relevant response will be sent.
 
-- Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
-  If it isn't matching any of the cart items in the cart a releveant reponse is sent.
-  Any other error will send a relevant response message.
+2. Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
 
-7. Orders:
+- If it isn't matching any of the cart items in the cart a releveant reponse is sent.
+- Any other error will send a relevant response message.
+
+### Orders:
 
 ## Testing with Supertest and Jest
 
