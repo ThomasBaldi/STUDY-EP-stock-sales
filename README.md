@@ -291,13 +291,19 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ## Testing with Supertest and Jest
 
-Testing has been implemented using Jest and Supertest, altho it was declared as Unit testing, I believe this to be more of an Integration testing.
+Testing has been implemented using Jest and Supertest and, altho it was declared as Unit testing, I believe this to be more of an Integration testing.
 
-In any case, each requested test get's performed in one main execution once you run "npm run test" but they are each set separately and will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell.
+Nevertheless, each requested test get's performed in one main execution once you run "npm run test" but each test is set separately and will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell (--runInBand).
 
 All tests return a success message once run and should do so for whomever else tryes to run them, especially because I've added an extra feature, which prevents an erronic attempt at running the tests without previously dropping and recreating the tables in the database.
 
 In short, you don't need to manually drop and create any the database nor the tables, as there's a db.sequelize.sync({force:true}) function set to be run before the first test starts being executed, once you run the test command.
+
+I haven't implemented the same function to be run at the end of the tests as I thought you might want to see their results in the actual databse.
+
+Should you run tests prior to manually test each endpoint with Postman, please remember to drop and create the database and reload the application.
+
+![image](https://github.com/ThomasBaldi/stock-sales/assets/114188470/6f34c8fb-015d-49a9-a359-2389bc581514)
 
 ## Libraries/Packages Link
 
