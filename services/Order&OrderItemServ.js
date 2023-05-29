@@ -50,6 +50,22 @@ class OrderService {
 		});
 	}
 
+	async getAllOrderItems(id) {
+		return this.Order.findAll({
+			raw: true,
+			where: {
+				id: id,
+			},
+			include: {
+				model: this.OrderItem,
+				attributes: [
+					['ItemId', 'id'],
+					['Quantity', 'quant'],
+				],
+			},
+		});
+	}
+
 	async getAllOrdersQuery() {
 		return (
 			this.Order.findAll({

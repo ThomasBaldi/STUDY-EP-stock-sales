@@ -225,8 +225,6 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 1. Registered users that have checkdout their carts and have had their orders completed can see their orders and their details through "GET/orders"
 
----
-
 - This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order and when it was created and updated.
 - The Admin has also access to this endpoint and will have the exact same view as the users but will see all users orders, no matter the current status (complete/cancelled/in-process).
 - Should any error is handled and triggers a relevant response.
