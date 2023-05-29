@@ -80,12 +80,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 ---
 
 4. Only the Admin can delete categories through "DELETE/category/:id" by giving the id of such category as a parameter.
-   Error messages are in place should the id not match any existing category or be currently in use with any items.
+
+- Error messages are in place should the id not match any existing category or be currently in use with any items.
 
 ### Items:
 
 1. Everyone has acces to "GET/items" but, as per requirements, guest users will only be able to see in-stock items.
-   An error message will be displayed in the response body should there be any issue retrieving all items.
+
+- An error message will be displayed in the response body should there be any issue retrieving all items.
 
 ---
 
@@ -110,13 +112,22 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 3. Only the Admin can update an item through "PUT/item/:id" with a request body and by passing an existing item id as a parameter.
 
+```JSON
+{
+    "Price": 20,
+    "Quantity": 50,
+    "Category": 2
+}
+```
+
 - The update is possible with any combination of attribute, could for example be simply a Name change or a PRICE, SKU and Image change, the attributes you add to the request body will be the ones being updated.
 - Checks are made for validation and error handling with relevant response messages.
 
 ---
 
 4. Only the Admin can delete items through "DELETE/item/:id" by giving the id of such item as a parameter.
-   Error messages are in place should the id not match any existing item.
+
+- Error messages are in place should the id not match any existing item.
 
 ### Signup and Login:
 
