@@ -237,9 +237,71 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - Should any error occur while retrieving such data, a relevant response message is sent.
 - This endpoint uses as specified in the requests a raw sql query to retrieve all the data.
 
+### Order-Items:
+
+1. POST/ORDER/:ID
+
+---
+
+2. Only the Admin can change the status of an order through PUT/order/:id by passing an orders id as a parameter and sending the request with a body like the following one:
+
+```JSON
+{
+    "Status": "complete",
+}
+```
+
+- An order has 3 statuses, by default it is "in-progress", then the Admin can process it and either set it to "complete" or "cancelled".
+- If it is set to complete, the customer of that order will now be able to see it in the previously explained GET endpoint. If it is set to cancelled, the endpoint will restore the quantities of each item belonging to that order in the inventary, that were subtracted during order creation.
+- All errors are handled and have a relevant message set to be sent as a result.
+
+### Search:
+
+1. The search endpoint is available for anyone through "POST/search" and it can be used for finding items based on search criteria, by sending a request body like the following ones:
+
+```JSON
+{
+    "Items": "lap", //will return all items that contain lap in their name
+}
+```
+
+```JSON
+{
+    "SKU": "FT234", //will return the item that has SKU FT234
+}
+```
+
+```JSON
+{
+    "Categories": "Electronics", //will return all items with category name Electronics
+}
+```
+
+```JSON
+{
+    "Items": "lap",
+     "Categories": "Electronics",
+    // will return all items with category name Electronics and item name containing lap
+}
+```
+
+- As described in the examples, one can search items by partial item name, specific category name, a combination of those two or by specific SKU code.
+- The endpoint has validators in place to make sure that for example, one can't send an empty attribute request or that a SKU actually is provided in the right format.
+- All error types are as per usual handled and send a relevant response message.
+
 ## Testing with Supertest and Jest
 
+Testing has been implemented using Jest and Supertest, altho it was declared as Unit testing, I believe this to be more of an Integration testing.
+
+In any case, each requested test get's performed in one main execution once you run "npm run test" but they are each set separately and will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell.
+
+All tests return a success message once run and should do so for whomever else tryes to run them, especially because I've added an extra feature, which prevents an erronic attempt at running the tests without previously dropping and recreating the tables in the database.
+
+In short, you don't need to manually drop and create any the database nor the tables, as there's a db.sequelize.sync({force:true}) function set to be run before the first test starts being executed, once you run the test command.
+
 ## Libraries/Packages Link
+
+Node version => v18.12.1
 
 ```JSON
 "dependencies": {
