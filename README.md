@@ -5,9 +5,9 @@ Back-end system for a Stock-control and sales system.
 ## Installation Instructions
 
 1. Download the complete repository as a zip file.
-2. Unzip all its content and save in a new directory on your computer.
-3. Open the directory in VScode and run "npm install" to make sure that all dependencies are correclty installed.
-4. Open mySQL Workbench, start a local instance and run the following code:
+2. Unzip all its content and save it in a new directory on your computer.
+3. Open the directory in VScode and run "npm install" to make sure that all dependencies are correclty installed and up to date.
+4. Open mySQL Workbench, start a local instance and run the following querries:
 
 ```
 CREATE USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P@ssw0rd';
@@ -15,7 +15,10 @@ ALTER USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P@ssw0r
 GRANT ALL PRIVILEGES ON database_name.* TO 'admin'@'localhost';
 ```
 
-This will create the user that will interact and have all access to the database of the system. 5. Run `CREATE DATABASE StockSalesDB;` to create the databse/schema. 6. Go back to Vscode, create a .env file at the main branch of the directory(same level as app.js), and copy paste the following variables in it (make sure also to save):
+This will create the user that will interact and have all access to the database of the system.
+
+5. Run `CREATE DATABASE StockSalesDB;` to create the databse/schema.
+6. Go back to Vscode, create a .env file at the main branch of the directory(same level as app.js), and copy paste the following variables in it (make sure also to save):
 
 ```
 ADMIN_USERNAME="admin"
