@@ -39,7 +39,6 @@ router
 				groupUsers.forEach((e) => {
 					e.User = {
 						UserId: e[0].UserId,
-						Username: e[0]['User.Username'],
 						Orders: [],
 					};
 					e.forEach((x) => {
@@ -75,7 +74,6 @@ router
 		try {
 			//get all orders and all items in orders
 			let order = await orderSer.getAllOrdersQuery();
-			console.log(order);
 			let userOrders = order.slice(1);
 			var allOrders = [];
 			let byOrder = Object.values(

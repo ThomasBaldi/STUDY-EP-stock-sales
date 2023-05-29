@@ -44,7 +44,7 @@ You can either follow the Postaman documentation here () or the instructions and
 
 First of all, let's populate the database with the "POST/setup" endpoint.
 
-- It doesn't need a body
+- The request doesn't need a body
 - It will create 2 roles, 1 = Admin and 2 = User,
 - It then creates a unique Admin user (there's a hook on the user model to reinforce the prevention of any other Admins from being created)
 - It then makes a call to the provided Noroff API which is used to store items and categories
@@ -57,6 +57,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 1. Everyone has access to "GET/categories" (an error response message will be sent should there be any errors)
 
+---
+
 2. Only the Admin can add new categories through "POST/category" with a request body:
 
 ```JSON
@@ -64,6 +66,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 ```
 
 - Error messages are given if there is a missing body to the request or if the category already exists.
+
+---
 
 3. Only the Admin can update a category through "PUT/cateogry/:id" with a request body:
 
@@ -73,6 +77,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 - Error messages are in place for, parameter id not matching any category id, body not having any Name spcified, name provided already in use in another category.
 
+---
+
 4. Only the Admin can delete categories through "DELETE/category/:id" by giving the id of such category as a parameter.
    Error messages are in place should the id not match any existing category or be currently in use with any items.
 
@@ -80,6 +86,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 1. Everyone has acces to "GET/items" but, as per requirements, guest users will only be able to see in-stock items.
    An error message will be displayed in the response body should there be any issue retrieving all items.
+
+---
 
 2. Only the Admin can add items through "POST/item" with a request body like the following:
 
@@ -98,10 +106,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - Checks are made to validate that all attributes provided are either available(category id), meeting format requirements(SKU) or are not already in use on other items (as per the unique constraints of Name and SKU).
 - Should any error happen, a relevant message will be sent in the response body.
 
+---
+
 3. Only the Admin can update an item through "PUT/item/:id" with a request body and by passing an existing item id as a parameter.
 
 - The update is possible with any combination of attribute, could for example be simply a Name change or a PRICE, SKU and Image change, the attributes you add to the request body will be the ones being updated.
 - Checks are made for validation and error handling with relevant response messages.
+
+---
 
 4. Only the Admin can delete items through "DELETE/item/:id" by giving the id of such item as a parameter.
    Error messages are in place should the id not match any existing item.
@@ -123,6 +135,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - A hook is set up on the user model to enforce such email duplicate restriction and prevent a fifth equal email to be added on signup.
 - As per previous endpoints, all errors are handled and return relevant response messages.
 - During the signup call, the password is hashed and salted using crypto and then stored in the database as datatype BLOB for security reasons.
+
+---
 
 2. Admin and existing users can login through "POST/login" with a request body like the following one:
 
@@ -146,10 +160,15 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - With this endpoint users will be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
 - The endpoint handles errors should there be any in retrieving such data.
 
+---
+
 2. Only the Admin can access the "GET/allcarts" endpoint.
 
 - The result body is the same as the get/cart for users, simply it shows all carts of all the users.
 - The endpoint handles errors should there be any in retrieving such data.
+- This endpoint uses, as specified in the requests, a raw sql query to retrieve all the data.
+
+---
 
 3. Registered users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
 
@@ -171,6 +190,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - Any other type of error is also handled and will have a response with relevant message.
 - The cart item references the item from the items table, but the price is inserted in the cart item to prevent price changes, should the items price be changed while the user has the item in his/her cart.
 
+---
+
 2. Registered users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
 
 ```JSON
@@ -182,12 +203,30 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - This endpoint checks if the quantity is available in the inventory and if it is, it'll update the quantity of the desired cart item, otherwise it'll notify the user with a response body of the too high quantity request and showing the max available current quantity of the ionventory.
 - If any other error happens, it'll be handled and a relevant response will be sent.
 
-2. Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
+---
+
+3. Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
 
 - If it isn't matching any of the cart items in the cart a releveant reponse is sent.
 - Any other error will send a relevant response message.
 
 ### Orders:
+
+1. Registered users that have checkdout their carts and have had their orders completed can see their orders and their details through "GET/orders"
+
+---
+
+- This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order and when it was created and updated.
+- The Admin has also access to this endpoint and will have the exact same view as the users but will see all users orders, no matter the current status (complete/cancelled/in-process).
+- Should any error is handled and triggers a relevant response.
+
+---
+
+2. Only the Admin has access to the "GET/allorders
+
+- In this endpoint, the Admin will have the same view as the one from the previous endpoint, but each order will also list the owner of the order and every order item and its details.
+- Should any error occur while retrieving such data, a relevant response message is sent.
+- This endpoint uses as specified in the requests a raw sql query to retrieve all the data.
 
 ## Testing with Supertest and Jest
 
