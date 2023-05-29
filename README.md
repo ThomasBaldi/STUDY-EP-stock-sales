@@ -1,4 +1,4 @@
-# Stock-control and sales application - EndProject Assignment
+# Stock-control and sales application - EP Assignment
 
 Back-end system for a Stock-control and sales system.
 
@@ -18,7 +18,7 @@ GRANT ALL PRIVILEGES ON database_name.* TO 'admin'@'localhost';
 This will create the user that will interact and have all access to the database of the system.
 
 5. Run `CREATE DATABASE StockSalesDB;` to create the databse/schema.
-6. Go back to Vscode, create a .env file at the main branch of the directory(same level as app.js), and copy paste the following variables in it (make sure also to save):
+6. Go back to Vscode, create a .env file at the main branch of the directory (same level as app.js), and copy paste the following variables in it (make sure also to save):
 
 ```
 ADMIN_USERNAME="admin"
