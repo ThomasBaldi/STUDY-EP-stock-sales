@@ -39,6 +39,7 @@ router
 				groupUsers.forEach((e) => {
 					e.User = {
 						UserId: e[0].UserId,
+						Username: e[0]['User.Username'],
 						Orders: [],
 					};
 					e.forEach((x) => {

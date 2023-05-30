@@ -132,6 +132,15 @@ class CartService {
 			},
 		});
 	}
+
+	async deleteCartItem(id, cartId) {
+		return this.CartItem.destroy({
+			where: {
+				ItemId: id,
+				CartId: cartId,
+			},
+		});
+	}
 }
 
 module.exports = CartService;

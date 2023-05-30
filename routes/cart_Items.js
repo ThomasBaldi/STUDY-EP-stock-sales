@@ -85,7 +85,7 @@ router
 			} catch (err) {
 				console.log(err);
 				res.status(400).json({
-					message: 'Something went wrong with the cart item search.',
+					message: 'Something went wrong while putting the item in the cart.',
 				});
 			}
 		}

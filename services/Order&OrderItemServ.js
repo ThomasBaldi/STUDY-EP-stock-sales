@@ -25,6 +25,17 @@ class OrderService {
 		});
 	}
 
+	async getUserOrderInPro(userId) {
+		return this.Order.findOne({
+			raw: true,
+			where: {
+				UserId: userId,
+				Status: 'in_progress',
+			},
+			order: [['id', 'DESC']],
+		});
+	}
+
 	async getAllOrders() {
 		return this.Order.findAll({
 			raw: true,
@@ -105,8 +116,8 @@ class OrderService {
 
 	//order items methods -----------
 
-	async createOrderItems(items) {
-		return this.OrderItem.bulkCreate(items);
+	async createOrderItem(item) {
+		return this.OrderItem.create(item);
 	}
 }
 

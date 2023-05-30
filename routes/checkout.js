@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const axios = require('axios');
 var db = require('../models');
 var jwt = require('jsonwebtoken');
 var UserService = require('../services/UserService');
@@ -10,6 +11,8 @@ var userSer = new UserService(db);
 var cartSer = new CartService(db);
 var itemSer = new ItemService(db);
 var orderSer = new OrderService(db);
+
+let url = 'http://localhost:3000';
 
 var { checkIfUser } = require('../models/middleware/authMiddleware');
 
@@ -57,7 +60,7 @@ router.post('/', checkIfUser, async (req, res, next) => {
 				});
 				res.status(400).json({
 					Message:
-						'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed your checkout.',
+						'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed with your checkout.',
 					Items: items,
 				});
 			} else {
@@ -70,32 +73,37 @@ router.post('/', checkIfUser, async (req, res, next) => {
 					var Discount = 'No discount! Family discounts available when using the same email!';
 					var FinalTotal = Total;
 				}
-				//create order
+				//create order and fix itemsCart so that it fits the orderItem attributes
 				await orderSer.createOrder(userId, FinalTotal);
-				//create orderItems
 				let order = await orderSer.getLastUserOrder(userId);
 				itemsCart.forEach((e) => {
 					(e.OrderId = order.id), (e.Name = e['Item.Name']), delete e['Item.Name'];
 				});
-				await orderSer.createOrderItems(itemsCart);
-				//delete cart items once orderItems are created
-				await cartSer.deleteAllCartItems(cart);
-				//change item quantities
-				itemsCart.forEach(async (e) => {
-					let item = await itemSer.itemById(e.ItemId);
-					let body = { Quantity: item.Quantity - e.Quantity };
-					if (body.Quantity == 0) {
-						body.Status = 'out-of-stock';
-					}
-					await itemSer.updateItem(e.ItemId, body);
-				});
-				res.status(200).json({
-					message: 'Cart has been checked-out and order is placed!',
-					OrderId: order.id,
-					TotalPrice: Total,
-					Discount: Discount,
-					FinalPrice: FinalTotal,
-				});
+				try {
+					itemsCart.forEach(async (e) => {
+						await axios.post(
+							`${url}/order/${e.ItemId}`,
+							{
+								body: { Item: e },
+							},
+							{
+								headers: {
+									Authorization: 'Bearer ' + token,
+								},
+							}
+						);
+					});
+					res.status(200).json({
+						message: 'Cart has been checked-out and order is placed!',
+						OrderId: order.id,
+						TotalPrice: Total,
+						Discount: Discount,
+						FinalPrice: FinalTotal,
+					});
+				} catch (err) {
+					console.log(err);
+					res.status(500).json({ message: 'An interna server error occured' });
+				}
 			}
 		}
 	} catch (err) {
