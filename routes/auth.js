@@ -21,11 +21,9 @@ router
 			} else {
 				if (!Username || !Email || !Password) {
 					res.status(400).json({ message: 'One or more properties are missing.' });
-				}
-				if (!Email.match(validEmail)) {
+				} else if (Email && !Email.match(validEmail)) {
 					res.status(400).json({ message: 'Email format is invalid' });
-				}
-				if (userExists) {
+				} else if (userExists) {
 					if (Username == userExists.Username) {
 						res.status(400).json({ message: 'Username already exists' });
 					}
@@ -64,37 +62,38 @@ router
 				}
 				if (!crypto.timingSafeEqual(Buffer.from(userExists.Password), hash)) {
 					res.status(400).json({ message: 'Invalid Password.' });
-				}
-				let token;
-				let expire;
-				if (userExists.Role === 1) {
-					expire = '24H';
 				} else {
-					expire = '2H';
-				}
-				try {
-					token = jwt.sign(
-						{
-							UserId: userExists.id,
-							Email: userExists.Email,
-							Role: userExists.Role,
-							Cart: cart.id,
-						},
-						process.env.TOKEN_SECRET,
+					let token;
+					let expire;
+					if (userExists.Role === 1) {
+						expire = '24H';
+					} else {
+						expire = '2H';
+					}
+					try {
+						token = jwt.sign(
+							{
+								UserId: userExists.id,
+								Email: userExists.Email,
+								Role: userExists.Role,
+								Cart: cart.id,
+							},
+							process.env.TOKEN_SECRET,
 
-						{ expiresIn: expire }
-					);
-				} catch (err) {
-					console.log(err);
-					const error = new Error('Error! Something went wrong.');
-					return next(error);
+							{ expiresIn: expire }
+						);
+					} catch (err) {
+						console.log(err);
+						const error = new Error('Error! Something went wrong.');
+						return next(error);
+					}
+					res.status(200).json({
+						message: `You are now logged in!`,
+						data: {
+							token: token,
+						},
+					});
 				}
-				res.status(200).json({
-					message: `You are now logged in!`,
-					data: {
-						token: token,
-					},
-				});
 			});
 		}
 	});

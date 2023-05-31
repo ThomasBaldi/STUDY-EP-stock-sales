@@ -49,7 +49,7 @@ class CartService {
 			this.Cart.findAll({ where: {} }),
 			sequelize
 				.query(
-					'SELECT users.Username AS `Username`, carts.Status AS Status, carts.id AS `CartId`, cartitems.ItemID AS `ItemId`, items.Name AS `Name`, cartitems.Price AS `Price`, cartitems.Quantity AS `Quantity` FROM users JOIN carts ON users.id = carts.UserId JOIN cartitems ON carts.id = cartitems.CartId JOIN items ON cartitems.ItemId = items.id'
+					'SELECT users.Username AS `Username`, carts.id AS `CartId`, cartitems.ItemID AS `ItemId`, items.Name AS `Name`, cartitems.Price AS `Price`, cartitems.Quantity AS `Quantity` FROM users JOIN carts ON users.id = carts.UserId JOIN cartitems ON carts.id = cartitems.CartId JOIN items ON cartitems.ItemId = items.id'
 				)
 				.catch((err) => {
 					return err;

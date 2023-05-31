@@ -237,9 +237,9 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - Should any error occur while retrieving such data, a relevant response message is sent.
 - This endpoint uses as specified in the requests a raw sql query to retrieve all the data.
 
-### Order-Items:
+---
 
-1. When a user is logged in and has items in the cart, POST/order/:id can be used.
+3. When a user is logged in and has items in the cart, POST/order/:id can be used.
 
 - this endpoint takes an item.id as a parameter
 - searches for a cartItem with the same id
@@ -254,11 +254,11 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - else it will send a response message saying that the itemorder is placed in the specific order.
 
 - this endpoint is also called upon from within a different endpoint POST/cart/checkout
-  (as I deemed that a checkout should automatically place an order and all orderitems with one request, this was my initial solution(without an internal POST request). I've then changed it so that it would do the same automatic checkout of all(with a POST request within it), but by using this endpoint here, hoping it would better meet your requiremnets dear "customer")
+  (as I deemed that a checkout should automatically place an order and all orderitems with one request, this was my initial solution (without an internal POST request). I've then changed it so that it would do the same automatic checkout of all (with a POST request within it), but by using this endpoint here, hoping it would better meet your requiremnets dear "customer")
 
 ---
 
-2. Only the Admin can change the status of an order through PUT/order/:id by passing an orders id as a parameter and sending the request with a body like the following one:
+4. Only the Admin can change the status of an order through PUT/order/:id by passing an orders id as a parameter and sending the request with a body like the following one:
 
 ```JSON
 {
@@ -270,7 +270,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - If it is set to complete, the customer of that order will now be able to see it in the previously explained GET endpoint. If it is set to cancelled, the endpoint will restore the quantities of each item belonging to that order in the inventary, that were subtracted during order creation.
 - All errors are handled and have a relevant message set to be sent as a result.
 
-### Extra endpoint for automatic CHECKOUT of all items (POST/cart/checkout)
+### Extra endpoint => POST/cart/checkout
 
 1. As mentioned in POST/order/:id, I've added this endpoint to allow for an "easier" checkout solution than the one the "customer" has required.
    Nonetheless, as mentioned in that endpoint specifications, I've set up this one so that a POST request is sent from within POST/cart/checkout, which calls the POST/order/:id and creates an order, all orderitems and totalprices, and does all the same validation and error handling.

@@ -113,16 +113,18 @@ router
 						let result = await itemSer.searchItems(Items);
 						if (result.length <= 0) {
 							res.status(400).json(noRes);
+						} else {
+							res.status(200).json({ ItemsResult: result });
 						}
-						res.status(200).json({ ItemsResult: result });
 					}
 					if (Categories && !Items) {
 						//specific category name
 						let result = await itemSer.searchCat(Categories);
 						if (result.length <= 0) {
 							res.status(400).json(noRes);
+						} else {
+							res.status(200).json({ CategoryResult: result });
 						}
-						res.status(200).json({ CategoryResult: result });
 					}
 					if (SKU) {
 						if (!SKU.match(skuRegex)) {

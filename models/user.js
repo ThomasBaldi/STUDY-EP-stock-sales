@@ -12,9 +12,6 @@ module.exports = (sequelize, Sequelize) => {
 		Email: {
 			type: Sequelize.DataTypes.STRING,
 			allowNull: false,
-			validate: {
-				isEmail: true,
-			},
 		},
 		Salt: {
 			type: Sequelize.DataTypes.BLOB,

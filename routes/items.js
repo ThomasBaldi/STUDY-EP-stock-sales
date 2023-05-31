@@ -21,12 +21,12 @@ router
 			let allItems = await itemSer.getAll();
 			var availableItems = [];
 			allItems.forEach((e) => {
-				if (e.Status === 'in-stock') {
+				if (e.Status == 'in-stock') {
 					availableItems.push(e);
 				}
 			});
 			//Guest Users can only view in-stock items. (items catalogue rule)
-			if ((token = req.headers.authorization == undefined)) {
+			if (req.headers.authorization == undefined) {
 				res.status(200).json({
 					message: 'All available items!',
 					Items: availableItems,

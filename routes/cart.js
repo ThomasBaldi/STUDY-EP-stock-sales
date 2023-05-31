@@ -31,7 +31,7 @@ router
 			}
 			res.status(200).json({
 				Cart: {
-					id: decodedToken.Cart,
+					CartId: decodedToken.Cart,
 					Total: Total,
 					ItemsInCart: ItemsInCart,
 				},
@@ -46,6 +46,7 @@ router
 	.get('/allcarts', checkIfAdmin, async (req, res) => {
 		try {
 			let carts = await cartSer.getAllQuery();
+			console.log(carts);
 			let usersCarts = carts.slice(1);
 			let groupedByUser = Object.values(
 				usersCarts[0].reduce((a, c) => {
