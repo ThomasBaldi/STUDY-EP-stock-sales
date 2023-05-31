@@ -166,7 +166,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ### Cart:
 
-1. Registered users can access the "GET/cart" endpoint.
+1. Logged in users can access the "GET/cart" endpoint.
 
 - With this endpoint users will be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
 - The endpoint handles errors should there be any in retrieving such data.
@@ -181,14 +181,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-3. Registered users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
+3. Logged in users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
 
 - Should they pass a cart number that isn't theirs, an error message will be sent as a response.
 - Otherwise, should there be any error during the deletion, a relevant message will be in the response.
 
 ### Cart-Items:
 
-1. Registered users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
+1. Logged in users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
 
 ```JSON
 {
@@ -203,7 +203,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-2. Registered users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
+2. Logged in users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
 
 ```JSON
 {
@@ -216,14 +216,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-3. Registered users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
+3. Logged in users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
 
 - If it isn't matching any of the cart items in the cart a releveant reponse is sent.
 - Any other error will send a relevant response message.
 
 ### Orders:
 
-1. Registered users that have checkdout their carts and have had their orders completed can see their orders and their details through "GET/orders"
+1. Logged in users that have checkdout their carts and have had their orders completed can see their orders and their details through "GET/orders"
 
 - This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order and when it was created and updated.
 - The Admin has also access to this endpoint and will have the exact same view as the users but will see all users orders, no matter the current status (complete/cancelled/in-process).
@@ -239,7 +239,22 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ### Order-Items:
 
-1. POST/ORDER/:ID
+1. When a user is logged in and has items in the cart, POST/order/:id can be used.
+
+- this endpoint takes an item.id as a parameter
+- searches for a cartItem with the same id
+- then makes a check of available stock quantity for it (if available it continues the process, else, terminates the request with a relevant message)
+- if it continues and finds a matching cartitem, a total of all the cartitems is calculated, if any discount is available (as per the up to 4 same emails discount plans) that is also applied to the TotalPrice
+- it then creates an "in-process" order (if not existing) with the TotalPrice and userid gathered from the token,
+  (there can only be one "in-process" order, which is the solution I cam up with for handling the fact that the way this endpoint was requested, it didn't take in consideration the possible issue of multiple orders being created as it takes one itemid at the time...)
+- then it creates an itemorder with order.id of the order created/found
+- then changes the stock quantity of the relevant item from item tables
+- then deletes the relevant cartitem from the cart
+- then checks if the cart is empty, if yes, it returns the checkout message with totalprice before discount, discount percentage, final total price and order.id
+- else it will send a response message saying that the itemorder is placed in the specific order.
+
+- this endpoint is also called upon from within a different endpoint POST/cart/checkout
+  (as I deemed that a checkout should automatically place an order and all orderitems with one request, this was my initial solution(without an internal POST request). I've then changed it so that it would do the same automatic checkout of all(with a POST request within it), but by using this endpoint here, hoping it would better meet your requiremnets dear "customer")
 
 ---
 
@@ -254,6 +269,15 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 - An order has 3 statuses, by default it is "in-progress", then the Admin can process it and either set it to "complete" or "cancelled".
 - If it is set to complete, the customer of that order will now be able to see it in the previously explained GET endpoint. If it is set to cancelled, the endpoint will restore the quantities of each item belonging to that order in the inventary, that were subtracted during order creation.
 - All errors are handled and have a relevant message set to be sent as a result.
+
+### Extra endpoint for automatic CHECKOUT of all items (POST/cart/checkout)
+
+1. As mentioned in POST/order/:id, I've added this endpoint to allow for an "easier" checkout solution than the one the "customer" has required.
+   Nonetheless, as mentioned in that endpoint specifications, I've set up this one so that a POST request is sent from within POST/cart/checkout, which calls the POST/order/:id and creates an order, all orderitems and totalprices, and does all the same validation and error handling.
+
+Put simply, in POST/cart/checkout, an order is created, then there's a loop calling an axios.post request to that /order/:id endpoint for each element present in the cart.
+
+On the /order/:id end, this is received as a body object, and all orderitems creation, cartitems deletion, items stock quantity changes are done.
 
 ### Search:
 
@@ -293,13 +317,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 Testing has been implemented using Jest and Supertest and, altho it was declared as Unit testing, I believe this to be more of an Integration testing.
 
-Nevertheless, each requested test get's performed in one main execution once you run "npm run test" but each test is set separately and will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell (--runInBand).
+Nevertheless, each requested test get's performed in one main Test Suit once you run "npm run test" and each test will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell
+(--runInBand comes inn handy here).
 
-All tests return a success message once run and should do so for whomever else tryes to run them, especially because I've added an extra feature, which prevents an erronic attempt at running the tests without previously dropping and recreating the tables in the database.
+All tests return a success message once run and should do so for whomever else tries to run them, especially because I've added an extra feature, which prevents an erronic attempt at running the tests without previously dropping and recreating the tables in the database.
 
-In short, you don't need to manually drop and create any the database nor the tables, as there's a db.sequelize.sync({force:true}) function set to be run before the first test starts being executed, once you run the test command.
+In short, you don't need to manually drop and create any database or tables, as there's a db.sequelize.sync({force:true}) function set to be run before the first test gets executed.
 
-I haven't implemented the same function to be run at the end of the tests as I thought you might want to see their results in the actual databse.
+I haven't implemented the same function to be run at the end of the test suit as I thought you might want to see their remaining results in the actual databse.
 
 Should you run tests prior to manually test each endpoint with Postman, please remember to drop and create the database and reload the application.
 
