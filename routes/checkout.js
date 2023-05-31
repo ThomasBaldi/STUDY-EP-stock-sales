@@ -60,7 +60,7 @@ router.post('/', checkIfUser, async (req, res, next) => {
 				});
 				res.status(400).json({
 					Message:
-						'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed with your checkout.',
+						'The items listed have too low stock to meet your requested quantities, please change the quantities in the cart to proceed with your checkout.',
 					Items: items,
 				});
 			} else {

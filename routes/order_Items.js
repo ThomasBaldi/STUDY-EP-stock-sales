@@ -14,19 +14,22 @@ var cartSer = new CartService(db);
 var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
 
 router
-	/* this endpoint is called by a Post request within POST/cart/checkout,
-	that sends a post request for each item that is in the cart.
-	this endpoints specifications didn't consider the implication of having an order 
-	being created here, and then adding an orderItem with such order id.
-	As requested, it is meant to set one orderItem at the time, 
-	this could result in multiple orders being created for a single cart being 
-	checkedout... 
+	/* this endpoint has 2 methods of use:
+	it can be used through POST/cart/checkout which has a Post request within it.
+	that endpoint creates an order and sends a post request for each item that is 
+	in the users cart.
+	
+	otherwise I've implemented the requested endpoint functionalities, 
+	but its specifications didn't consider the implication of 
+	having an order	being created for each call, and then adding an orderItem with 
+	such order id. Basically creating a new order for each item in the cart.
+	The workaround I came up with was to have only a restriction to 1 order per customer
+	with an "in-progress" status.
 	furthermore, I don't believe this to be a very thought-through request of a checkout 
-	system, it has an excess of complexity added to it that really isn't needed...
-	It could and should have easily been a POST/order/:cartId that automatically
-	creates one order and an itemorder for each cart item, 
-	or simply put a checkout that automatically creates all of this 
-	based on all the users cart..
+	system, it has an excess of complexity added to it that really isn't needed.
+	It could and should have easily been a POST/order/:cartId (or even just POST/order)
+	that automatically creates one order and an itemorder for each 
+	cart item (with same orderId)
 	 */
 	.post('/:id', checkIfUser, async (req, res, next) => {
 		const token = req.headers.authorization.split(' ')[1];
@@ -34,9 +37,10 @@ router
 		let cart = decodedToken.Cart;
 		//accept either the post body from /checkout or the Item from
 		//a single direct request
-		let { body, Order } = req.body;
+		/* let { body } = req.body; */
 		//automatic post request from within checkout endpoint
-		if (body) {
+		if (req.body.body) {
+			let { body } = req.body;
 			//create the order item
 			await orderSer.createOrderItem(body.Item);
 			//delete cart items once orderItems are created
@@ -49,11 +53,10 @@ router
 			}
 			await itemSer.updateItem(body.Item.ItemId, quant);
 		}
-		/////////////////////////////////////////////////////////////////
 		//in case one would really add ane orderItem at the time with a direct request
 		//to this endpoint instead of using the automatic (check-them-all-out)
-		//checkout endpoint...
-		if (Order) {
+		//POST/cart/checkout endpoint...
+		else {
 			let paramId = req.params.id;
 			var Total = [];
 			let cartItems = await cartSer.getAll(cart);
@@ -71,7 +74,6 @@ router
 			cartItems.forEach(async (e) => {
 				Total.push(e['CartItems.Price'] * e['CartItems.Quantity']);
 			});
-
 			//check stock availability
 			var lowStock = [];
 			await Promise.all(
@@ -89,7 +91,7 @@ router
 				});
 				res.status(400).json({
 					Message:
-						'These items cannot be ordered as they have a too high quantity for the current available stock quantity, please change the quantities in the cart to proceed with your checkout.',
+						'The items listed have too low stock to meet your requested quantities, please change the quantities in the cart to proceed with your checkout.',
 					Items: items,
 				});
 			} else {
@@ -112,10 +114,9 @@ router
 					}
 					//create orderId
 					let UserId = decodedToken.UserId;
-					let lastOrder = await orderSer.getUserOrderInPro(UserId);
-					console.log(lastOrder);
-					if (!lastOrder) {
-						lastOrder = await orderSer.createOrder(UserId, Total);
+					let orderInPro = await orderSer.getUserOrderInPro(UserId);
+					if (!orderInPro) {
+						orderInPro = await orderSer.createOrder(UserId, Total);
 					}
 					//create oorderItem
 					let orderItem = {
@@ -123,7 +124,7 @@ router
 						Quantity: isInCart['CartItems.Quantity'],
 						Price: isInCart['CartItems.Price'],
 						ItemId: isInCart['CartItems.Item.id'],
-						OrderId: lastOrder.id,
+						OrderId: orderInPro.id,
 					};
 					await orderSer.createOrderItem(orderItem);
 					//change stock quantity
@@ -141,7 +142,7 @@ router
 					if (itemsStillIn.length === 0) {
 						res.status(200).json({
 							message: 'Cart has been checked-out and order is placed!',
-							OrderId: lastOrder.id,
+							OrderId: orderInPro.id,
 							TotalPrice: Total,
 							Discount: Discount,
 							FinalPrice: FinalTotal,
