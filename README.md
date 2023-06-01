@@ -38,7 +38,7 @@ TOKEN_SECRET='7bbfda2dc66ae26fb8e3028cbddece55d19514292d048bce237005904b98747036
 
 ## Endpoints and system usage:
 
-You can either follow the Postaman documentation here () or the instructions and details I am adding to this section of the readme.
+You can either follow the Postaman documentation here (https://documenter.getpostman.com/view/25181873/2s93mBwyw9) or the instructions and details I am adding to this section of the readme.
 
 ### Setup:
 
