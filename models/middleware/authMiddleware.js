@@ -4,7 +4,7 @@ module.exports = {
 	checkIfAdmin: (req, res, next) => {
 		let token = req.headers.authorization;
 		if (!token) {
-			res.status(200).json({
+			res.status(400).json({
 				status: 'Failure',
 				message: 'Token was not provided.',
 			});
@@ -22,7 +22,7 @@ module.exports = {
 	checkIfUser: (req, res, next) => {
 		let token = req.headers.authorization;
 		if (!token) {
-			res.status(200).json({
+			res.status(400).json({
 				status: 'Failure',
 				message: 'Token was not provided. Please register as a User and Login to get your token.',
 			});
@@ -40,7 +40,7 @@ module.exports = {
 	checkIfToken: (req, res, next) => {
 		let token = req.headers.authorization;
 		if (!token) {
-			res.status(200).json({
+			res.status(400).json({
 				status: 'Failure',
 				message: 'Token was not provided. Please register as a User and Login to get your token.',
 			});

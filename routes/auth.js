@@ -29,18 +29,20 @@ router
 					}
 				} else {
 					let salt = crypto.randomBytes(16);
-					crypto.pbkdf2(Password, salt, 310000, 32, 'sha256', (err, hash) => {
-						if (err) throw new Error('Internal Server Error');
-						try {
-							userSer.create(Username, hash, Email, salt);
-							res.status(200).json({
-								message: `User with Username: ${Username} was successfully created.`,
-							});
-						} catch (err) {
-							console.log(err);
-							res.status(400);
-						}
-					});
+					crypto
+						.pbkdf2(Password, salt, 310000, 32, 'sha256', (err, hash) => {
+							if (err) throw new Error('Internal Server Error');
+							try {
+								userSer.create(Username, hash, Email, salt);
+								res.status(200).json({
+									message: `User with Username: ${Username} was successfully created.`,
+								});
+							} catch (err) {
+								console.log(err);
+								res.status(400);
+							}
+						})
+						.redirect('/login');
 				}
 			}
 		}
@@ -87,12 +89,15 @@ router
 						const error = new Error('Error! Something went wrong.');
 						return next(error);
 					}
-					res.status(200).json({
-						message: `You are now logged in!`,
-						data: {
-							token: token,
-						},
-					});
+					res
+						.status(200)
+						.json({
+							message: `You are now logged in!`,
+							data: {
+								token: token,
+							},
+						})
+						.redirect('/');
 				}
 			});
 		}

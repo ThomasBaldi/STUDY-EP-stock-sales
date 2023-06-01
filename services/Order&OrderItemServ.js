@@ -36,6 +36,15 @@ class OrderService {
 		});
 	}
 
+	async getOrder(id) {
+		return this.Order.findOne({
+			raw: true,
+			where: {
+				id: id,
+			},
+		});
+	}
+
 	async getAllOrders() {
 		return this.Order.findAll({
 			raw: true,

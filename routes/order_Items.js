@@ -162,14 +162,19 @@ router
 		let orderId = req.params.id;
 		let Status = req.body.Status;
 		let statusVals = /in-process|complete|cancelled/;
+		let orderExists = await orderSer.getOrder(orderId);
 		try {
 			if (!Status) {
-				res.status(200).json({
+				res.status(400).json({
 					message: `A status wasn't provided in your request.`,
 				});
 			} else if (!statusVals.test(Status)) {
-				res.status(200).json({
+				res.status(400).json({
 					message: `Status can be only one of these types: in-process / complete / cancelled`,
+				});
+			} else if (!orderExists) {
+				res.status(400).json({
+					message: `There is no order with id ${orderId}`,
 				});
 			} else {
 				await orderSer.statusUpdate(orderId, Status);

@@ -55,12 +55,12 @@ router
 					allOrders.push(e.User);
 				});
 				if (order.length == 0) {
-					res.status(400).json({
+					res.status(200).json({
 						Message: 'There are no completed orders to be seen yet.',
 					});
 				} else {
 					res.status(200).json({
-						Order: allOrders,
+						Orders: allOrders,
 					});
 				}
 			}
