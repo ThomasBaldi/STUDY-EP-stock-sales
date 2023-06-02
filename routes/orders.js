@@ -92,6 +92,7 @@ router
 					Created: o[0].createdAt,
 					Updated: o[0].updatedAt,
 					Username: o[0].Username,
+					Fullname: o[0].Firstname + ' ' + o[0].Lastname,
 					Status: o[0].Status,
 					Total: o[0].TotalPrice,
 					Items: [],

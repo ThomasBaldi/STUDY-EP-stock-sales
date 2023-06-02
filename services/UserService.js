@@ -21,8 +21,10 @@ class UserService {
 
 	//user----------
 
-	async create(username, password, email, salt) {
+	async create(firstname, lastname, username, password, email, salt) {
 		return this.User.create({
+			FirstName: firstname,
+			LastName: lastname,
 			Username: username,
 			Password: password,
 			Email: email,
@@ -30,9 +32,11 @@ class UserService {
 		});
 	}
 
-	async createAdmin(username, password, email, salt) {
+	async createAdmin(firstname, lastname, username, password, email, salt) {
 		return this.User.findOrCreate({
 			where: {
+				FirstName: firstname,
+				LastName: lastname,
 				Username: username,
 				Password: password,
 				Email: email,

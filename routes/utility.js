@@ -58,7 +58,7 @@ router
 				crypto.pbkdf2('P@ssword2023', salt, 310000, 32, 'sha256', (err, hash) => {
 					if (err) throw new Error('Internal Server Error');
 					try {
-						userSer.createAdmin('Admin', hash, 'admin@admin.com', salt);
+						userSer.createAdmin('Admin', 'Admin', 'Admin', hash, 'admin@admin.com', salt);
 					} catch (err) {
 						console.log(err);
 						res.status(400).json({

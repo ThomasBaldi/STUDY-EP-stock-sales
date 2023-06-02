@@ -46,7 +46,6 @@ router
 	.get('/allcarts', checkIfAdmin, async (req, res) => {
 		try {
 			let carts = await cartSer.getAllQuery();
-			console.log(carts);
 			let usersCarts = carts.slice(1);
 			let groupedByUser = Object.values(
 				usersCarts[0].reduce((a, c) => {
@@ -59,6 +58,7 @@ router
 			groupedByUser.forEach((e) => {
 				e.Cart = {
 					Username: e[0].Username,
+					Fullname: e[0].Firstname + ' ' + e[0].Lastname,
 					CartId: e[0].CartId,
 					Items: [],
 				};
@@ -69,7 +69,7 @@ router
 						Price: x.Price,
 						Quantity: x.Quantity,
 					};
-					e.Cart.Items.push(Item);
+					if (x.ItemId) e.Cart.Items.push(Item);
 				}),
 					finalArray.push(e.Cart);
 			});

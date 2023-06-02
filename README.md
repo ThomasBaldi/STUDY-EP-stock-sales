@@ -135,6 +135,8 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ```JSON
 {
+    "FirstName": "Joe",
+    "LastName": "Pesci",
     "Username": "TestUser",
     "Password": "test123",
     "Email": "test@test.com",
