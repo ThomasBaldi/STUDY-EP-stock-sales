@@ -38,11 +38,11 @@ TOKEN_SECRET='7bbfda2dc66ae26fb8e3028cbddece55d19514292d048bce237005904b98747036
 
 ## Endpoints and system usage:
 
-You can either follow the Postaman documentation here (https://documenter.getpostman.com/view/25181873/2s93mBwyw9) or the instructions and details I am adding to this section of the readme.
+You can either follow the Postaman documentation here which has all result examples for each endpoint (https://documenter.getpostman.com/view/25181873/2s93mBwyw9) or the instructions and details I am adding to this section of the readme.
 
 ### Setup:
 
-First of all, let's populate the database with the "POST/setup" endpoint.
+First of all, let's populate the database with the `POST/setup` endpoint.
 
 - The request doesn't need a body
 - It will create 2 roles, 1 = Admin and 2 = User,
@@ -55,11 +55,11 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ### Categories:
 
-1. Everyone has access to "GET/categories" (an error response message will be sent should there be any errors)
+1. Everyone has access to `GET/categories` (an error response message will be sent should there be any errors)
 
 ---
 
-2. Only the Admin can add new categories through "POST/category" with a request body:
+2. Only the Admin can add new categories through `POST/category` with a request body:
 
 ```JSON
 { "Name": "TestCategory" }
@@ -69,7 +69,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-3. Only the Admin can update a category through "PUT/cateogry/:id" with a request body:
+3. Only the Admin can update a category through `PUT/cateogry/:id` with a request body:
 
 ```JSON
 { "Name": "UpdatedCategory" }
@@ -79,7 +79,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-4. Only the Admin can delete categories through "DELETE/category/:id" by giving the id of such category as a parameter.
+4. Only the Admin can delete categories through `DELETE/category/:id` by giving the id of such category as a parameter.
 
 - Error messages are in place should the id not match any existing category or be currently in use with any items.
 
@@ -91,7 +91,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-2. Only the Admin can add items through "POST/item" with a request body like the following:
+2. Only the Admin can add items through `POST/item` with a request body like the following:
 
 ```JSON
 {
@@ -110,7 +110,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-3. Only the Admin can update an item through "PUT/item/:id" with a request body and by passing an existing item id as a parameter.
+3. Only the Admin can update an item through `PUT/item/:id` with a request body and by passing an existing item id as a parameter.
 
 ```JSON
 {
@@ -125,13 +125,13 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-4. Only the Admin can delete items through "DELETE/item/:id" by giving the id of such item as a parameter.
+4. Only the Admin can delete items through `DELETE/item/:id` by giving the id of such item as a parameter.
 
 - Error messages are in place should the id not match any existing item.
 
 ### Signup and Login:
 
-1. Guests can signup through "POST/signup" with a request body like the following one:
+1. Guests can signup through `POST/signup` with a request body like the following one:
 
 ```JSON
 {
@@ -151,7 +151,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-2. Admin and existing users can login through "POST/login" with a request body like the following one:
+2. Admin and existing users can login through `POST/login` with a request body like the following one:
 
 ```JSON
 {
@@ -168,29 +168,29 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ### Cart:
 
-1. Logged in users can access the "GET/cart" endpoint.
+1. Logged in users can access the `GET/cart` endpoint.
 
 - With this endpoint users will be able to see they're cart and cart id, the current total price of their cart and the items they've added to it (with Item details such as name id price and quantity)
 - The endpoint handles errors should there be any in retrieving such data.
 
 ---
 
-2. Only the Admin can access the "GET/allcarts" endpoint.
+2. Only the Admin can access the `GET/allcarts` endpoint.
 
-- The result body is the same as the get/cart for users, simply it shows all carts of all the users.
+- The result body is the same as the get/cart for users, simply it shows all carts of all the users plus their fullname and username.
 - The endpoint handles errors should there be any in retrieving such data.
 - This endpoint uses, as specified in the requests, a raw sql query to retrieve all the data.
 
 ---
 
-3. Logged in users can empty their carts of all cartitems in it by accessing the "DELETE/cart/:id" and passing their cart id as a parameter.
+3. Logged in users can empty their carts of all cartitems in it by accessing the `DELETE/cart/:id` and passing their cart id as a parameter.
 
 - Should they pass a cart number that isn't theirs, an error message will be sent as a response.
 - Otherwise, should there be any error during the deletion, a relevant message will be in the response.
 
 ### Cart-Items:
 
-1. Logged in users can add cart items to their cart through "POST/cart_item" with a request body like the following one:
+1. Logged in users can add cart items to their cart through `POST/cart_item` with a request body like the following one:
 
 ```JSON
 {
@@ -205,7 +205,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-2. Logged in users that have added items in their cart can change the desired quantity for the respective items through "PUT/item_cart/:id" with a the item id as a parameter and a request body like the following one:
+2. Logged in users that have added items in their cart can change the desired quantity for the respective items through `PUT/item_cart/:id` with a the item id as a parameter and a request body like the following one:
 
 ```JSON
 {
@@ -218,14 +218,14 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-3. Logged in users can remove a spoecifc cart item from their cart through "DELETE/cart_item/:id" by passing the specific cart item id as a parameter.
+3. Logged in users can remove a spoecifc cart item from their cart through `DELETE/cart_item/:id` by passing the specific cart item id as a parameter.
 
 - If it isn't matching any of the cart items in the cart a releveant reponse is sent.
 - Any other error will send a relevant response message.
 
 ### Orders:
 
-1. Logged in users that have checkdout their carts and have had their orders completed can see their orders and their details through "GET/orders"
+1. Logged in users that have checkdout their carts and have had their orders completed can see their orders and their details through `GET/orders`
 
 - This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order and when it was created and updated.
 - The Admin has also access to this endpoint and will have the exact same view as the users but will see all users orders, no matter the current status (complete/cancelled/in-process).
@@ -233,15 +233,15 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-2. Only the Admin has access to the "GET/allorders
+2. Only the Admin has access to the `GET/allorders`
 
-- In this endpoint, the Admin will have the same view as the one from the previous endpoint, but each order will also list the owner of the order and every order item and its details.
+- In this endpoint, the Admin will have the same view as the one from the previous endpoint, but each order will also list the owner (fullname and username) of the order and every order item and its details.
 - Should any error occur while retrieving such data, a relevant response message is sent.
 - This endpoint uses as specified in the requests a raw sql query to retrieve all the data.
 
 ---
 
-3. When a user is logged in and has items in the cart, POST/order/:id can be used.
+3. When a user is logged in and has items in the cart, `POST/order/:id` can be used.
 
 - this endpoint takes an item.id as a parameter
 - searches for a cartItem with the same id
@@ -260,7 +260,7 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ---
 
-4. Only the Admin can change the status of an order through PUT/order/:id by passing an orders id as a parameter and sending the request with a body like the following one:
+4. Only the Admin can change the status of an order through `PUT/order/:id` by passing an orders id as a parameter and sending the request with a body like the following one:
 
 ```JSON
 {
@@ -274,16 +274,16 @@ First of all, let's populate the database with the "POST/setup" endpoint.
 
 ### Extra endpoint => POST/cart/checkout
 
-1. As mentioned in POST/order/:id, I've added this endpoint to allow for an "easier" checkout solution than the one the "customer" has required.
-   Nonetheless, as mentioned in that endpoint specifications, I've set up this one so that a POST request is sent from within POST/cart/checkout, which calls the POST/order/:id and creates an order, all orderitems and totalprices, and does all the same validation and error handling.
+1. As mentioned in POST/order/:id, I've added the `POST/cart/checkout` endpoint to allow for an "easier" checkout solution than the one the "customer" has required.
 
-Put simply, in POST/cart/checkout, an order is created, then there's a loop calling an axios.post request to that /order/:id endpoint for each element present in the cart.
+- Nonetheless, as mentioned in that endpoint specifications, I've set up this one so that a POST request is sent from within POST/cart/checkout, which calls the POST/order/:id and creates an order, all orderitems and totalprices, and does all the same validation and error handling.
 
-On the /order/:id end, this is received as a body object, and all orderitems creation, cartitems deletion, items stock quantity changes are done.
+- Simply put, in POST/cart/checkout, an order is created, then there's a loop calling an axios.post request to that /order/:id endpoint for each element present in the cart.
+  On the /order/:id end, this is received as a body object, and all orderitems creation, cartitems deletion, items stock quantity changes are done.
 
 ### Search:
 
-1. The search endpoint is available for anyone through "POST/search" and it can be used for finding items based on search criteria, by sending a request body like the following ones:
+1. The search endpoint is available for anyone through `POST/search` and it can be used for finding items based on search criteria, by sending a request body like the following ones:
 
 ```JSON
 {
