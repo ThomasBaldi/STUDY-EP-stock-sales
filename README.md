@@ -85,7 +85,7 @@ First of all, let's populate the database with the `POST/setup` endpoint.
 
 ### Items:
 
-1. Everyone has acces to "GET/items" but, as per requirements, guest users will only be able to see in-stock items.
+1. Everyone has acces to `GET/items` but, as per requirements, guest users will only be able to see in-stock items.
 
 - An error message will be displayed in the response body should there be any issue retrieving all items.
 
