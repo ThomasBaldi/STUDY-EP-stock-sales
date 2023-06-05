@@ -319,7 +319,9 @@ First of all, let's populate the database with the `POST/setup` endpoint.
 
 Testing has been implemented using Jest and Supertest and, altho it was declared as Unit testing, I believe this to be more of an Integration testing.
 
-Nevertheless, each requested test get's performed in one main Test Suit once you run "npm run test" and each test will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell
+Remember to have the application up and running with `npm start`
+
+Nevertheless, each requested test is performed in one main Test Suit once you run `npm run test` and each test will be executed synchronousely from top to bottom, which was part of the fun, being that Jest is set to execute tests in parallell
 (--runInBand comes inn handy here).
 
 All tests return a success message once run and should do so for whomever else tries to run them, especially because I've added an extra feature, which prevents an erronic attempt at running the tests without previously dropping and recreating the tables in the database.
@@ -330,7 +332,7 @@ I haven't implemented the same function to be run at the end of the test suit as
 
 Should you run tests prior to manually test each endpoint with Postman, please remember to drop and create the database and reload the application.
 
-![image](https://github.com/ThomasBaldi/stock-sales/assets/114188470/8e347988-861d-42aa-87ca-3d1030519615)
+![image](https://github.com/ThomasBaldi/ScraperNews/assets/114188470/e044483d-8ad2-492b-962f-59c73ceeee0e)
 
 ## Libraries/Packages Link
 

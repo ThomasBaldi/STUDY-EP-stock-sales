@@ -5,17 +5,18 @@ var db = require('../models');
 var UserService = require('../services/UserService');
 var userSer = new UserService(db);
 
-/* const { save } = require('./save_json'); */
 var authRouter = require('../routes/auth');
 var utilityRouter = require('../routes/utility');
 var itemsRouter = require('../routes/items');
 var categoriesRouter = require('../routes/categories');
+var ordersRouter = require('../routes/orders');
 
 app.use(express.json());
 app.use('/', authRouter);
 app.use('/', utilityRouter);
 app.use('/', itemsRouter);
 app.use('/', categoriesRouter);
+app.use('/', ordersRouter);
 
 rewriteTables = async () => {
 	await db.sequelize.sync({ force: true });
@@ -35,7 +36,13 @@ describe('testing-API-ednpoints', () => {
 	});
 	//2 post /signup endpoint – registers a new user.
 	test('POST /signup - success', async () => {
-		let user = { Username: 'TestUser', Password: 'test123', Email: 'test@test.com' };
+		let user = {
+			FirstName: 'Test',
+			LastName: 'User',
+			Username: 'TestUser',
+			Password: 'test123',
+			Email: 'test@test.com',
+		};
 		const res = await request(app).post('/signup').send(user);
 		expect(res.status).toBe(200);
 		expect(res.body).toHaveProperty('message');
@@ -157,25 +164,24 @@ describe('testing-API-ednpoints', () => {
 	});
 	//8 Test the Admin user endpoints with the user created in test 1
 	//(at least 3 endpoints should be tested).
-	test('PUT /item name, PUT /item price and quantity PUT/category name - success', async () => {
-		let newName = {
-			Name: 'PROVA_PROVA',
+	test('PUT /category name, PUT /item price and quantity GET/allorders - success', async () => {
+		let newCatName = {
+			Name: 'AnvediCheMerda',
 		};
 		let newPrice = {
 			Price: 100,
 			Quantity: 2000,
 		};
-		let newCatName = {
-			Name: 'Fottetevi',
-		};
 		//test update of item name
 		const res = await request(app)
-			.put('/item/161')
+			.put('/category/9')
 			.set('Authorization', 'Bearer ' + token)
-			.send(newName);
+			.send(newCatName);
 		expect(res.status).toBe(200);
 		expect(res.body).toHaveProperty('message');
-		expect(res.body.message).toEqual('Item with id: 161 was successfully updated.');
+		expect(res.body.message).toEqual(
+			'Category with id: 9 was successfully updated to AnvediCheMerda.'
+		);
 		//test update of item price
 		const res2 = await request(app)
 			.put('/item/161')
@@ -186,12 +192,11 @@ describe('testing-API-ednpoints', () => {
 		expect(res2.body.message).toEqual('Item with id: 161 was successfully updated.');
 		//test update of category name
 		const res3 = await request(app)
-			.put('/category/9')
-			.set('Authorization', 'Bearer ' + token)
-			.send(newCatName);
-		expect(res3.status).toBe(200);
+			.get('/allorders')
+			.set('Authorization', 'Bearer ' + token);
+		expect(res3.status).toBe(400);
 		expect(res3.body).toHaveProperty('message');
-		expect(res3.body.message).toEqual('Category with id: 9 was successfully updated to Fottetevi.');
+		expect(res3.body.message).toEqual('There are no orders to be seen yet.');
 	});
 	//9 Delete all the values added to the database in the previous tests
 	//(CAT_TEST, ITEM_TEST, and the user created).

@@ -104,9 +104,9 @@ router
 				});
 				allOrders.push(o.Order);
 			});
-			if (order.length == 0) {
+			if (allOrders.length == 0) {
 				res.status(400).json({
-					Message: 'There are no orders to be seen yet.',
+					message: 'There are no orders to be seen yet.',
 				});
 			} else {
 				res.status(200).json({
