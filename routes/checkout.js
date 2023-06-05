@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const axios = require('axios');
 var db = require('../models');
-var jwt = require('jsonwebtoken');
 var UserService = require('../services/UserService');
 var ItemService = require('../services/Item&CategoryServ');
 var CartService = require('../services/Cart&CartItemServ');
@@ -14,11 +13,10 @@ var orderSer = new OrderService(db);
 
 let url = 'http://localhost:3000';
 
-var { checkIfUser } = require('../models/middleware/authMiddleware');
+var { checkIfUser, getDecoded } = require('../models/middleware/authMiddleware');
 
 router.post('/', checkIfUser, async (req, res, next) => {
-	const token = req.headers.authorization.split(' ')[1];
-	const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+	const decodedToken = getDecoded(req);
 	//set discount rates
 	let equalEmails = await userSer.getAllEmails(decodedToken.Email);
 	if (equalEmails.length == 2) {

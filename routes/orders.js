@@ -1,19 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var jwt = require('jsonwebtoken');
-var CartService = require('../services/Cart&CartItemServ');
 var OrderService = require('../services/Order&OrderItemServ');
-var cartSer = new CartService(db);
 var orderSer = new OrderService(db);
 
-var { checkIfAdmin, checkIfToken } = require('../models/middleware/authMiddleware');
+var { checkIfAdmin, checkIfToken, getDecoded } = require('../models/middleware/authMiddleware');
 
 router
 	.get('/orders', checkIfToken, async (req, res, next) => {
 		try {
-			const token = req.headers.authorization.split(' ')[1];
-			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+			const decodedToken = getDecoded(req);
 			let UserRole = decodedToken.Role;
 			let UserId = decodedToken.UserId;
 			if (!token) {

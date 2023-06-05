@@ -10,6 +10,12 @@ var cartSer = new CartService(db);
 
 const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
+let findMissing = (obj) => {
+	return Object.keys(obj)
+		.filter((key) => obj[key] === null || obj[key] === undefined || obj[key] === '')
+		.join(', ');
+};
+
 router
 	.post('/signup', async (req, res, next) => {
 		const { FirstName, LastName, Username, Password, Email } = req.body;
@@ -20,7 +26,9 @@ router
 				res.status(400).json({ message: 'Email address has already been used on 4 accounts!' });
 			} else {
 				if (!Username || !Email || !Password || !FirstName || !LastName) {
-					res.status(400).json({ message: 'One or more properties are missing.' });
+					const missing = findMissing(req.body);
+					console.log(missing);
+					res.status(400).json({ message: `Missing values for ${missing}.` });
 				} else if (Email && !Email.match(validEmail)) {
 					res.status(400).json({ message: 'Email format is invalid' });
 				} else if (userExists) {
@@ -49,7 +57,8 @@ router
 		const { Username, Password } = req.body;
 		const userExists = await userSer.getOne(Username);
 		if (!Username || !Password) {
-			res.status(400).json({ message: 'One or more properties are missing.' });
+			const missing = findMissing(req.body);
+			res.status(400).json({ message: `Missing values for ${missing}.` });
 		} else if (!userExists) {
 			res.status(400).json({ message: 'Invalid Username.' });
 		} else {

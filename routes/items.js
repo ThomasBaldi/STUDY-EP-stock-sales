@@ -49,9 +49,12 @@ router
 		let skuExists = await itemSer.getSKU(SKU);
 		let categoryExists = await itemSer.catById(Category);
 		if (!Name || !Price || !SKU || !Category) {
-			res.status(400).json({
-				message: 'One or more mandatory fields are missing.',
-			});
+			const missing = Object.keys(req.body)
+				.filter(
+					(key) => req.body[key] === null || req.body[key] === undefined || req.body[key] === ''
+				)
+				.join(', ');
+			res.status(400).json({ message: `Missing values for ${missing}.` });
 		}
 		if (nameExists) {
 			res.status(400).json(nameMsg);

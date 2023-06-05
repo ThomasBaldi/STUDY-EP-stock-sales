@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var jwt = require('jsonwebtoken');
 var CartService = require('../services/Cart&CartItemServ');
 var cartSer = new CartService(db);
 
@@ -10,8 +9,7 @@ var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware
 router
 	.get('/cart', checkIfUser, async (req, res) => {
 		try {
-			const token = req.headers.authorization.split(' ')[1];
-			const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+			const decodedToken = getDecoded(req);
 			var ItemsInCart = [];
 			var Total = [];
 			let cartItems = await cartSer.getUserCartItem(decodedToken.Cart);
@@ -85,8 +83,7 @@ router
 	})
 	.delete('/cart/:id', checkIfUser, async (req, res) => {
 		let id = req.params.id;
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		const decodedToken = getDecoded(req);
 		try {
 			if (id) {
 				if (id == decodedToken.Cart) {

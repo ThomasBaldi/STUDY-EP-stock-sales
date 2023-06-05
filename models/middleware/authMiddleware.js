@@ -1,6 +1,9 @@
 var jwt = require('jsonwebtoken');
 
 module.exports = {
+	getDecoded: (req) => {
+		return jwt.verify(req.headers.authorization.split(' ')[1], process.env.TOKEN_SECRET);
+	},
 	checkIfAdmin: (req, res, next) => {
 		let token = req.headers.authorization;
 		if (!token) {

@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var jwt = require('jsonwebtoken');
 var UserService = require('../services/UserService');
 var OrderService = require('../services/Order&OrderItemServ');
 var ItemService = require('../services/Item&CategoryServ');
@@ -11,7 +10,7 @@ var orderSer = new OrderService(db);
 var itemSer = new ItemService(db);
 var cartSer = new CartService(db);
 
-var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
+var { checkIfAdmin, checkIfUser, getDecoded } = require('../models/middleware/authMiddleware');
 
 router
 	/* this endpoint has 2 methods of use:
@@ -32,8 +31,7 @@ router
 	cart item (with same orderId)
 	 */
 	.post('/:id', checkIfUser, async (req, res, next) => {
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		const decodedToken = getDecoded(req);
 		let cart = decodedToken.Cart;
 		//accept either the post body from /checkout or the Item from
 		//a single direct request

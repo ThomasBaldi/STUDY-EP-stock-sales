@@ -1,13 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../models');
-var jwt = require('jsonwebtoken');
 var ItemService = require('../services/Item&CategoryServ');
 var itemSer = new ItemService(db);
 var CartService = require('../services/Cart&CartItemServ');
 var cartSer = new CartService(db);
 
-var { checkIfUser } = require('../models/middleware/authMiddleware');
+var { checkIfUser, getDecoded } = require('../models/middleware/authMiddleware');
 
 let itemToCart = { message: 'The item was added to your cart.' };
 let itemAlready = { message: 'This item is already in your cart.' };
@@ -17,8 +16,7 @@ let noSuchItemInCart = { message: 'There is no such item in your cart.' };
 router
 	.post('/', checkIfUser, async (req, res, next) => {
 		let body = req.body;
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		const decodedToken = getDecoded(req);
 		let cart = decodedToken.Cart;
 		if (!body) {
 			res.status(400).json({
@@ -55,8 +53,7 @@ router
 	.put('/:id', checkIfUser, async (req, res, next) => {
 		let quant = req.body.Quantity;
 		let id = req.params.id;
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		const decodedToken = getDecoded(req);
 		let cart = decodedToken.Cart;
 		if (!quant) {
 			res.status(400).json({
@@ -92,8 +89,7 @@ router
 	})
 	.delete('/:id', checkIfUser, async (req, res, next) => {
 		let id = req.params.id;
-		const token = req.headers.authorization.split(' ')[1];
-		const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+		const decodedToken = getDecoded(req);
 		let cart = decodedToken.Cart;
 		try {
 			if (id) {
