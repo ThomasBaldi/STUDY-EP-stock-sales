@@ -13,7 +13,6 @@ router
 			var ItemsInCart = [];
 			var Total = [];
 			let cartItems = await cartSer.getUserCartItem(decodedToken.Cart);
-			console.log(cartItems);
 			cartItems.forEach((e) => {
 				ItemsInCart.push({
 					Name: e['Item.Name'],

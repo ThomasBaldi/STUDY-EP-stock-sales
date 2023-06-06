@@ -56,7 +56,7 @@ class OrderService {
 		});
 	}
 
-	async getCompletedUSerOrders(id) {
+	async getCompletedUserOrders(id) {
 		return this.Order.findAll({
 			raw: true,
 			where: {

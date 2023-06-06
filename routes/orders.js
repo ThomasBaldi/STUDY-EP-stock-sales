@@ -22,7 +22,7 @@ router
 					var order = await orderSer.getAllOrders();
 				} else {
 					//get only all completed orders for user
-					var order = await orderSer.getCompletedUSerOrders(UserId);
+					var order = await orderSer.getCompletedUserOrders(UserId);
 				}
 				groupUsers = Object.values(
 					order.reduce((a, c) => {
