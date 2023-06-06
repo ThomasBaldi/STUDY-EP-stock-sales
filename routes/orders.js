@@ -12,7 +12,7 @@ router
 			const decodedToken = getDecoded(req);
 			let UserRole = decodedToken.Role;
 			let UserId = decodedToken.UserId;
-			if (!token) {
+			if (!decodedToken) {
 				res.status(400).json({
 					message: 'Only registered users or Admin has access to this endpoint.',
 				});

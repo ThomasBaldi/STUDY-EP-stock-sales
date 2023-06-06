@@ -4,7 +4,7 @@ var db = require('../models');
 var CartService = require('../services/Cart&CartItemServ');
 var cartSer = new CartService(db);
 
-var { checkIfAdmin, checkIfUser } = require('../models/middleware/authMiddleware');
+var { checkIfAdmin, checkIfUser, getDecoded } = require('../models/middleware/authMiddleware');
 
 router
 	.get('/cart', checkIfUser, async (req, res) => {
@@ -13,6 +13,7 @@ router
 			var ItemsInCart = [];
 			var Total = [];
 			let cartItems = await cartSer.getUserCartItem(decodedToken.Cart);
+			console.log(cartItems);
 			cartItems.forEach((e) => {
 				ItemsInCart.push({
 					Name: e['Item.Name'],
