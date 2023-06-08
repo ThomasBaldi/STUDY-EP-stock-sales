@@ -114,7 +114,7 @@ router
 					let UserId = decodedToken.UserId;
 					let orderInPro = await orderSer.getUserOrderInPro(UserId);
 					if (!orderInPro) {
-						orderInPro = await orderSer.createOrder(UserId, Total);
+						orderInPro = await orderSer.createOrder(UserId, FinalTotal);
 					}
 					//create oorderItem
 					let orderItem = {
@@ -141,9 +141,8 @@ router
 						res.status(200).json({
 							message: 'Cart has been checked-out and order is placed!',
 							OrderId: orderInPro.id,
-							TotalPrice: Total,
 							Discount: Discount,
-							FinalPrice: FinalTotal,
+							TotalPrice: orderInPro.TotalPrice,
 						});
 					} else {
 						//else send item is added to order...
