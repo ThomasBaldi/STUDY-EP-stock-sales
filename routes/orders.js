@@ -52,7 +52,7 @@ router
 				});
 				if (order.length == 0) {
 					res.status(200).json({
-						Message: 'There are no completed orders to be seen yet.',
+						Message: 'There are no orders to be seen yet.',
 					});
 				} else {
 					res.status(200).json({
