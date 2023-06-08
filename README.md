@@ -227,8 +227,8 @@ First of all, let's populate the database with the `POST/setup` endpoint.
 
 1. Logged in users that have checkdout their carts and have had their orders completed can see their orders and their details through `GET/orders`
 
-- This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order and when it was created and updated.
-- The Admin has also access to this endpoint and will have the exact same view as the users but will see all users orders, no matter the current status (complete/cancelled/in-process).
+- This endpoint will show each order a specific user has had complete by an Admin, and it will show order id, total price of order, when it was created and updated and all the orders related items.
+- The Admin has also access to this endpoint and will have an overview of all users orders (without the relative items of each order as that is already what /allorders does), no matter the current status (complete/cancelled/in-process).
 - Should any error is handled and triggers a relevant response.
 
 ---
@@ -252,7 +252,7 @@ First of all, let's populate the database with the `POST/setup` endpoint.
 - then it creates an itemorder with order.id of the order created/found
 - then changes the stock quantity of the relevant item from item tables
 - then deletes the relevant cartitem from the cart
-- then checks if the cart is empty, if yes, it returns the checkout message with totalprice before discount, discount percentage, final total price and order.id
+- then checks if the cart is empty, if yes, it returns the checkout message with discount percentage, final total price and order.id
 - else it will send a response message saying that the itemorder is placed in the specific order.
 
 - this endpoint is also called upon from within a different endpoint POST/cart/checkout
