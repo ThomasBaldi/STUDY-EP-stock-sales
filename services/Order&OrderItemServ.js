@@ -63,10 +63,12 @@ class OrderService {
 				UserId: id,
 				Status: 'complete',
 			},
-			include: {
-				model: this.User,
-				attributes: ['Username'],
-			},
+			include: [
+				{
+					model: this.OrderItem,
+					attributes: [['ItemId', 'id'], 'Name', ['Quantity', 'quant']],
+				},
+			],
 		});
 	}
 

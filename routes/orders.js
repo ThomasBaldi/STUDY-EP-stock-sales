@@ -17,39 +17,67 @@ router
 					message: 'Only registered users or Admin has access to this endpoint.',
 				});
 			} else {
+				var allOrders = [];
+
 				if (UserRole === 1) {
 					//get all orders (completed/in-progress/cancelled) of all users
 					var order = await orderSer.getAllOrders();
+					groupUsers = Object.values(
+						order.reduce((a, c) => {
+							a[c.UserId] = a[c.UserId] || [];
+							a[c.UserId].push(c);
+							return a;
+						}, {})
+					);
+					groupUsers.forEach((e) => {
+						e.User = {
+							UserId: e[0].UserId,
+							Username: e[0]['User.Username'],
+							Orders: [],
+						};
+						e.forEach((x) => {
+							Order = {
+								OrderId: x.id,
+								Created: x.createdAt,
+								Updated: x.updatedAt,
+								Status: x.Status,
+								Total: x.TotalPrice,
+							};
+							e.User.Orders.push(Order);
+						});
+						allOrders.push(e.User);
+					});
 				} else {
 					//get only all completed orders for user
 					var order = await orderSer.getCompletedUserOrders(UserId);
-				}
-				groupUsers = Object.values(
-					order.reduce((a, c) => {
-						a[c.UserId] = a[c.UserId] || [];
-						a[c.UserId].push(c);
-						return a;
-					}, {})
-				);
-				var allOrders = [];
-				groupUsers.forEach((e) => {
-					e.User = {
-						UserId: e[0].UserId,
-						Username: e[0]['User.Username'],
-						Orders: [],
-					};
-					e.forEach((x) => {
-						Order = {
-							OrderId: x.id,
-							Created: x.createdAt,
-							Updated: x.updatedAt,
-							Status: x.Status,
-							Total: x.TotalPrice,
+					groupOrders = Object.values(
+						order.reduce((a, c) => {
+							a[c.id] = a[c.id] || [];
+							a[c.id].push(c);
+							return a;
+						}, {})
+					);
+					console.log(groupOrders);
+					groupOrders.forEach((e) => {
+						e.Order = {
+							OrderId: e[0].id,
+							Created: e[0].createdAt,
+							Updated: e[0].updatedAt,
+							Status: e[0].Status,
+							Total: e[0].TotalPrice,
+							Items: [],
 						};
-						e.User.Orders.push(Order);
+						e.forEach((x) => {
+							Item = {
+								Id: x['OrderItems.id'],
+								Name: x['OrderItems.Name'],
+								Quantity: x['OrderItems.quant'],
+							};
+							e.Order.Items.push(Item);
+						});
+						allOrders.push(e.Order);
 					});
-					allOrders.push(e.User);
-				});
+				}
 				if (order.length == 0) {
 					res.status(200).json({
 						Message: 'There are no orders to be seen yet.',
