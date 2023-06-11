@@ -78,6 +78,7 @@ router.post('/', checkIfUser, async (req, res, next) => {
 					(e.OrderId = order.id), (e.Name = e['Item.Name']), delete e['Item.Name'];
 				});
 				try {
+					let token = req.headers.authorization.split(' ')[1];
 					itemsCart.forEach(async (e) => {
 						await axios.post(
 							`${url}/order/${e.ItemId}`,
